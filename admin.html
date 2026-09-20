@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم المشرف - الإدارة الاستراتيجية</title>
-    <!-- تضمين مكتبة TailwindCSS للتصميم الفاخر -->
     <script src="https://tailwindcss.com"></script>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
@@ -14,14 +13,13 @@
 <body class="p-4 md:p-8">
 
     <div class="max-w-2xl mx-auto space-y-6">
-        <!-- هيدر لوحة التحكم -->
         <div class="bg-slate-900 p-6 rounded-2xl border border-red-900/40 shadow-2xl text-center relative overflow-hidden">
             <div class="absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-red-500 via-yellow-500 to-red-500"></div>
             <h1 class="text-xl font-bold text-red-400 mb-1">🛡️ غرفة التحكم والمراقبة المركزية</h1>
             <p class="text-xs text-gray-500">خاص بالمشرفين المعتمدين فقط - عمليات السيرفر المباشرة</p>
         </div>
 
-        <!-- [ القسم الثالث ]: زر الصفقة السحري اليومي (The Magic Trade Button) -->
+        <!-- زر الصفقة السحري اليومي -->
         <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl text-center space-y-4">
             <div class="space-y-1">
                 <h2 class="text-lg font-bold text-yellow-400">⚡ زر الصفقة السحري اليومي</h2>
@@ -34,41 +32,20 @@
                 </button>
             </div>
             
-            <!-- مؤشر المعالجة والنتيجة -->
             <div id="magicStatus" class="text-xs hidden p-3 rounded-xl bg-slate-950 border border-slate-800"></div>
-        </div>
-
-        <!-- [ شاشة مراقبة الحالات والطلبات ] -->
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-            <h2 class="text-sm font-bold text-gray-400 mb-4 flex items-center gap-2">📑 طلبات الإيداع والسحب المعلقة (حياً)</h2>
-            <div class="space-y-2 text-xs">
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-300 font-bold">مستخدم افتراضي: sample_user</p>
-                        <p class="text-[10px] text-yellow-500">النوع: طلب إيداع (150 USDT)</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="alert('سيتم ربطه بقاعدة البيانات')" class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded-lg">موافقة</button>
-                        <button onclick="alert('سيتم ربطه بقاعدة البيانات')" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg">رفض</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- التوصيل البرمجي الذكي (Front-to-Back) -->
     <script>
-        // سنضع هنا رابط سيرفر Render بمجرد صدوره ليرتبط حياً
-        const BACKEND_URL = "http://localhost:5000"; 
+        // تم ربط السيرفر السحابي الحي الخاص بك هنا بنجاح
+        const BACKEND_URL = "https://onrender.com"; 
 
         async function triggerMagicButton() {
             const magicBtn = document.getElementById('magicBtn');
             const statusDiv = document.getElementById('magicStatus');
 
-            // تأكيد الإجراء لمنع الضغط بالخطأ
             if(!confirm("هل أنت متأكد من رغبتك في ضخ أرباح اليوم بنسبة 15% لجميع الحسابات؟")) return;
 
-            // تغيير حالة الزر لمنع التكرار أثناء المعالجة
             magicBtn.disabled = true;
             magicBtn.innerText = "⏳ جاري المعالجة الحسابية وضخ الأرباح...";
             
@@ -93,8 +70,7 @@
             } catch (err) {
                 statusDiv.className = "text-xs p-3 rounded-xl bg-slate-950 border border-red-500/20 text-red-400 text-center";
                 statusDiv.innerText = "❌ خطأ: لم يتم العثور على استجابة حيّة من السيرفر المركزي.";
-            } finally {
-                // إعادة الزر للعمل بعد الانتهاء
+            } {
                 magicBtn.disabled = false;
                 magicBtn.innerText = "🚀 تفعيل الصفقة وضخ الأرباح الحية";
             }

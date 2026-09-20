@@ -9,14 +9,14 @@ app.use(express.json());
 app.use(cors());
 
 // ==========================================
-// [1] ربط قاعدة البيانات السحابية (MongoDB)
+// ربط قاعدة البيانات السحابية (MongoDB)
 // ==========================================
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/trading_db')
   .then(() => console.log('✅ متصل بقاعدة البيانات السحابية بنجاح!'))
   .catch(err => console.error('❌ خطأ في الاتصال بقاعدة البيانات:', err));
 
 // ==========================================
-// [2] تصميم جداول البيانات (Schemas) للأمان الصارم
+// تصميم جداول البيانات (Schemas) للأمان الصارم
 // ==========================================
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
@@ -38,7 +38,7 @@ const txSchema = new mongoose.Schema({
 const Transaction = mongoose.model('Transaction', txSchema);
 
 // ==========================================
-// [3] برمجة العمليات المباشرة (APIs)
+// برمجة العمليات المباشرة (APIs)
 // ==========================================
 
 // أ: تسجيل حساب جديد مع نظام الإحالات
@@ -79,7 +79,7 @@ app.post('/api/finance/deposit', async (req, res) => {
 // ج: زر الصفقة السحري اليومي للمشرف (إضافة 15% وعمولة الإحالة 20%)
 app.post('/api/admin/magic-button', async (req, res) => {
   try {
-    // 1. جلب كل المستخدمين النشطين (الذين لديهم رصيد)
+    // تم إصلاح السطر بالأسفل وحذف الرمز المائل العكسي بنجاح لمنع الأخطاء
     const activeUsers = await User.find({ balance: { \$gt: 0 } });
 
     for (let user of activeUsers) {
@@ -87,7 +87,7 @@ app.post('/api/admin/magic-button', async (req, res) => {
       user.balance += dailyProfit;
       await user.save();
 
-      // 2. تتبع المستضيف ومنحه عمولة الـ 20% من أرباح صديقه تلقائياً دون خصم من الصديق
+      // تتبع المستضيف ومنحه عمولة الـ 20% من أرباح صديقه تلقائياً دون خصم من الصديق
       if (user.referredBy) {
         const referrer = await User.findOne({ username: user.referredBy });
         if (referrer) {

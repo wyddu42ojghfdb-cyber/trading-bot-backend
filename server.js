@@ -80,8 +80,9 @@ app.post('/api/finance/deposit', async (req, res) => {
 // ج: زر الصفقة السحري اليومي للمشرف (إضافة 15% وعمولة الإحالة 20%)
 app.post('/api/admin/magic-button', async (req, res) => {
   try {
-    // استخدام المعامل القياسي المقبول سحابياً \$gt بدون تداخل المترجمات
-    const activeUsers = await User.find({ balance: { \$gt: 0 } });
+    // تم تغيير طريقة الفحص الحسابي هنا بالكامل لتكون متوافقة 100% مع السيرفر السحابي وبدون رموز معقدة
+    const allUsers = await User.find({});
+    const activeUsers = allUsers.filter(u => u.balance > 0);
 
     for (let user of activeUsers) {
       const dailyProfit = user.balance * 0.15; // حساب ربح الـ 15%

@@ -2,16 +2,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 // ==========================================
-// ربط قاعدة البيانات السحابية (MongoDB)
+// ربط قاعدة البيانات السحابية مباشرة وبأمان
 // ==========================================
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/trading_db')
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/trading_db';
+
+mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ متصل بقاعدة البيانات السحابية بنجاح!'))
   .catch(err => console.error('❌ خطأ في الاتصال بقاعدة البيانات:', err));
 
@@ -79,7 +80,7 @@ app.post('/api/finance/deposit', async (req, res) => {
 // ج: زر الصفقة السحري اليومي للمشرف (إضافة 15% وعمولة الإحالة 20%)
 app.post('/api/admin/magic-button', async (req, res) => {
   try {
-    // تم إصلاح السطر بالأسفل وحذف الرمز المائل العكسي بنجاح لمنع الأخطاء
+    // استخدام المعامل القياسي المقبول سحابياً \$gt بدون تداخل المترجمات
     const activeUsers = await User.find({ balance: { \$gt: 0 } });
 
     for (let user of activeUsers) {
@@ -97,7 +98,7 @@ app.post('/api/admin/magic-button', async (req, res) => {
         }
       }
     }
-    res.status(200).json({ message: "🚀 تم ضغط الزر السحري! وزعت أرباح 15% وعمولات الإحالة 20% بنجاح حيوى!" });
+    res.status(200).json({ message: "🚀 تم ضغط الزر السحري! وزعت أرباح 15% وعمولات الإحالة 20% بنجاح حيوي!" });
   } catch (err) {
     res.status(500).json({ error: "خطأ أثناء تنفيذ الصفقة السحرية الجماعية" });
   }

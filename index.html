@@ -22,15 +22,25 @@
             <div id="botStatus" class="inline-block mt-3 px-3 py-1 bg-gray-700 text-xs rounded-full text-red-400">🤖 البوت: غير نشط (يتطلب إيداع)</div>
         </div>
 
-        <!-- [ القسم الثاني ]: نظام الإيداع الصارم -->
+        <!-- [ القسم الثاني ]: نظام الإيداع الصارم وعرض المحفظة -->
         <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
             <h2 class="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">💰 طلب تفعيل وإيداع رصيد</h2>
-            <p class="text-xs text-gray-400 mb-4">تنبيّه: الحد الأدنى للإيداع هو <span class="text-yellow-500 font-bold">100 USDT</span> (شبكة TRC-20). أي مبلغ أقل سيرفض تلقائياً.</p>
+            
+            <!-- صندوق نسخ محفظة الإيداع الرسمية للشركة -->
+            <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 mb-4 space-y-1.5 text-center">
+                <p class="text-[11px] text-gray-400">عنوان محفظة الشركة الرسمي لإرسال الـ USDT (شبكة TRC-20):</p>
+                <div class="bg-slate-950 p-2 rounded-lg text-xs font-mono text-yellow-400 select-all break-all border border-slate-800">
+                    TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN
+                </div>
+                <p class="text-[10px] text-gray-500">💡 اضغط ضغطة مطولة على العنوان أعلاه لنسخه مباشرة</p>
+            </div>
+
+            <p class="text-xs text-gray-400 mb-4">تنبيّه: الحد الأدنى للإيداع هو <span class="text-yellow-500 font-bold">100 USDT</span>. أي مبلغ أقل سيرفض تلقائياً من قبل السيرفر.</p>
             
             <div class="space-y-3">
                 <input type="text" id="depUsername" placeholder="اسم المستخدم الخاص بك" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
-                <input type="number" id="depAmount" placeholder="المبلغ (USDT)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
-                <input type="text" id="depAddress" placeholder="عنوان محفظتك المحول منها" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
+                <input type="number" id="depAmount" placeholder="المبلغ الذي قمت بتحويله (USDT)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
+                <input type="text" id="depAddress" placeholder="عنوان محفظتك الشخصية التي حولت منها" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
                 <button onclick="sendDeposit()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold p-3 rounded-xl transition-all">إرسال طلب الإيداع للمراجعة</button>
             </div>
             <div id="depMessage" class="text-xs mt-3 text-center"></div>
@@ -41,7 +51,7 @@
             <h2 class="text-lg font-bold text-red-400 mb-4">📤 سحب الأرباح والرصيد</h2>
             <div class="space-y-3">
                 <input type="number" id="witAmount" placeholder="المبلغ المراد سحبه" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-red-400">
-                <input type="text" id="witAddress" placeholder="عنوان محفظة الاستلام (TRC-20)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-red-400">
+                <input type="text" id="witAddress" placeholder="عنوان محفظة الاستلام الشخصية الخاصة بك (TRC-20)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-red-400">
                 <button onclick="sendWithdraw()" id="witBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded-xl transition-all">تقديم طلب السحب الفوري</button>
             </div>
             <div id="witMessage" class="text-xs mt-3 text-center"></div>
@@ -58,24 +68,24 @@
 
     <!-- التوصيل البرمجي الذكي (Front-to-Back) -->
     <script>
-        // سنضع هنا رابط سيرفر Render بمجرد صدوره ليرتبط حياً
+        // سنضع هنا رابط سيرفر Render بمجرد صدوره ليرتبط حياً بالخلفية
         const BACKEND_URL = "http://localhost:5000"; 
 
-        // دالة الإيداع الصارم
+        // دالة الإيداع الصارم ومراقبة فلتر الـ 100 USDT
         async function sendDeposit() {
             const username = document.getElementById('depUsername').value;
             const amount = document.getElementById('depAmount').value;
             const cryptoAddress = document.getElementById('depAddress').value;
             const msgDiv = document.getElementById('depMessage');
 
-            if(amount < 100) {
+            if(Number(amount) < 100) {
                 msgDiv.className = "text-xs mt-3 text-center text-red-400 font-bold";
-                msgDiv.innerText = "❌ فشل: الحد الأدنى للإيداع هو 100 USDT!";
+                msgDiv.innerText = "❌ فشل: الحد الأدنى للإيداع لتنشيط البوت هو 100 USDT!";
                 return;
             }
 
             msgDiv.className = "text-xs mt-3 text-center text-blue-400";
-            msgDiv.innerText = "جاري معالجة الطلب برمجياً...";
+            msgDiv.innerText = "جاري إرسال البيانات بشكل آمن للسيرفر...";
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/finance/deposit`, {
@@ -94,7 +104,7 @@
                 }
             } catch(err) {
                 msgDiv.className = "text-xs mt-3 text-center text-red-400";
-                msgDiv.innerText = "❌ فشل الاتصال بالسيرفر المركزي.";
+                msgDiv.innerText = "❌ فشل الاتصال التلقائي بالسيرفر المركزي.";
             }
         }
 

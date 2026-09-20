@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة التداول الذكية - حساب المشترك</title>
-    <!-- تضمين مكتبة TailwindCSS للتصميم الفاخر المتناسق -->
     <script src="https://tailwindcss.com"></script>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
@@ -22,11 +21,10 @@
             <div id="botStatus" class="inline-block mt-3 px-3 py-1 bg-gray-700 text-xs rounded-full text-red-400">🤖 البوت: غير نشط (يتطلب إيداع)</div>
         </div>
 
-        <!-- [ القسم الثاني ]: نظام الإيداع الصارم وعرض المحفظة -->
+        <!-- نظام الإيداع الصارم وعرض المحفظة -->
         <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
             <h2 class="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">💰 طلب تفعيل وإيداع رصيد</h2>
             
-            <!-- صندوق نسخ محفظة الإيداع الرسمية للشركة -->
             <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 mb-4 space-y-1.5 text-center">
                 <p class="text-[11px] text-gray-400">عنوان محفظة الشركة الرسمي لإرسال الـ USDT (شبكة TRC-20):</p>
                 <div class="bg-slate-950 p-2 rounded-lg text-xs font-mono text-yellow-400 select-all break-all border border-slate-800">
@@ -46,7 +44,7 @@
             <div id="depMessage" class="text-xs mt-3 text-center"></div>
         </div>
 
-        <!-- [ القسم الخامس ]: آلية سحب الأرباح المؤمنة والتواريخ الحية -->
+        <!-- آلية سحب الأرباح المؤمنة والتواريخ الحية -->
         <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl" id="withdrawSection">
             <h2 class="text-lg font-bold text-red-400 mb-4">📤 سحب الأرباح والرصيد</h2>
             <div class="space-y-3">
@@ -57,7 +55,7 @@
             <div id="witMessage" class="text-xs mt-3 text-center"></div>
         </div>
 
-        <!-- الإشعار الفاخر وسجل التواريخ الحية -->
+        <!-- السجل التاريخي الحي للعمليات -->
         <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
             <h2 class="text-sm font-bold text-gray-400 mb-3">🕒 السجل التاريخي الحي للعمليات</h2>
             <div id="liveHistory" class="space-y-2 text-xs">
@@ -66,12 +64,10 @@
         </div>
     </div>
 
-    <!-- التوصيل البرمجي الذكي (Front-to-Back) -->
     <script>
-        // سنضع هنا رابط سيرفر Render بمجرد صدوره ليرتبط حياً بالخلفية
-        const BACKEND_URL = "http://localhost:5000"; 
+        // تم ربط السيرفر السحابي الحي الخاص بك هنا بنجاح
+        const BACKEND_URL = "https://onrender.com"; 
 
-        // دالة الإيداع الصارم ومراقبة فلتر الـ 100 USDT
         async function sendDeposit() {
             const username = document.getElementById('depUsername').value;
             const amount = document.getElementById('depAmount').value;
@@ -104,11 +100,10 @@
                 }
             } catch(err) {
                 msgDiv.className = "text-xs mt-3 text-center text-red-400";
-                msgDiv.innerText = "❌ فشل الاتصال التلقائي بالسيرفر المركزي.";
+                msgDiv.innerText = "❌ فشل الاتصال التلقائي بالسيرفر المركزي المباشر.";
             }
         }
 
-        // دالة السحب المؤمنة (تخفي الزر فوراً لمنع التكرار والتلاعب)
         function sendWithdraw() {
             const amount = document.getElementById('witAmount').value;
             const address = document.getElementById('witAddress').value;
@@ -122,12 +117,10 @@
                 return;
             }
 
-            // صمام الأمان: إخفاء زر السحب تماماً فور الضغط لمنع التكرار الخبيث
             witBtn.style.display = 'none';
             msgDiv.className = "text-xs mt-3 text-center text-yellow-400";
             msgDiv.innerText = "🔒 تم قفل وتأمين الطلب وتحويله للمشرف...";
 
-            // تسجيل العملية في التواريخ الحية بدقة تامة (يوم، ساعة، دقيقة، ثانية)
             const now = new Date();
             const timeStr = `${now.toLocaleDateString('ar-EG')} - ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
             

@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -137,17 +136,17 @@ app.get('/admin-panel', (req, res) => {
                     if(data.length === 0) { list.innerHTML = '<p class="text-gray-500 text-center">🟢 لا توجد طلبات معلقة.</p>'; return; }
                     list.innerHTML = '';
                     data.forEach(req => {
-                        list.innerHTML += \`
-                            <div class="p-4 bg-black rounded-xl border border-gray-800 flex justify-between items-center">
-                                <div>
-                                    <p class="text-yellow-400 font-bold">👤 العميل: \${req.username}</p>
-                                    <p class="text-green-400 font-bold">💰 المبلغ: \${req.amount} USDT</p>
-                                </div>
-                                <button onclick="approve('\${req._id}')" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-xs">موافقة وتحديث الحساب</button>
-                            </div>
-                        \`;
+                        // تم إلغاء استخدام الرموز المعقدة لمنع توقف السيرفر نهائياً
+                        var row = borderDiv(req.username, req.amount, req._id);
+                        list.innerHTML += row;
                     });
                 } catch(e) { list.innerHTML = '<p class="text-red-400">خطأ في جلب البيانات</p>'; }
+            }
+            function borderDiv(user, amt, id) {
+                return '<div class="p-4 bg-black rounded-xl border border-gray-800 flex justify-between items-center">' +
+                       '<div><p class="text-yellow-400 font-bold">👤 العميل: ' + user + '</p>' +
+                       '<p class="text-green-400 font-bold">💰 المبلغ: ' + amt + ' USDT</p></div>' +
+                       '<button onclick="approve(\'' + id + '\')" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-xs">موافقة وتحديث الحساب</button></div>';
             }
             async function approve(id) {
                 await fetch('/api/admin/action', {
@@ -159,11 +158,13 @@ app.get('/admin-panel', (req, res) => {
                 loadRequests();
             }
             async function triggerMagic() {
+                document.getElementById('mBtn').disabled = true;
                 document.getElementById('mStatus').innerText = "جاري الحساب والضخ...";
                 await fetch('/api/admin/magic-button', { method: 'POST' });
                 document.getElementById('mStatus').innerText = "✅ نجح ضخ الأرباح والعمولات للملايين!";
+                document.getElementById('mBtn').disabled = false;
             }
-            setInterval(loadRequests, 4000);
+            setInterval(loadRequests, 5000);
         </script>
     </body>
     </html>
@@ -178,7 +179,4 @@ app.post('/api/finance/deposit', async (req, res) => {
     const { username, amount, cryptoAddress } = req.body;
     let user = await User.findOne({ username });
     if (!user) { user = new User({ username, password: "123" }); await user.save(); }
-    const newTx = new Transaction({ username, type: 'deposit', amount: Number(amount), cryptoAddress });
-    await newTx.save();
-    res.status(200).json({ message: "تم تسجيل طلب الإيداع وهو في لوحة التحكم الآن." });
     

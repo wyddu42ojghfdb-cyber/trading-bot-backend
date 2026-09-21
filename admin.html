@@ -1,134 +1,116 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المشرف - الإدارة الاستراتيجية</title>
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #060b13; color: #f3f4f6; }
+    </style>
+</head>
+<body class="p-4 bg-black">
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+    <div class="max-w-2xl mx-auto space-y-6 mt-4">
+        <!-- هيدر التحكم -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-red-900 shadow-2xl text-center">
+            <h1 class="text-xl font-bold text-red-400 mb-1">🛡️ غرفة التحكم والمراقبة المركزية</h1>
+            <p class="text-xs text-gray-500">خاص بالمشرفين - إدارة العمليات الحية لـ ملايين المشتركين</p>
+        </div>
 
-// ==========================================
-// ربط قاعدة البيانات السحابية مباشرة وبأمان
-// ==========================================
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/trading_db';
+        <!-- زر الصفقة السحري اليومي -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl text-center space-y-4">
+            <h2 class="text-lg font-bold text-yellow-400">⚡ زر الصفقة السحري اليومي</h2>
+            <p class="text-xs text-gray-400">اضغط لضخ أرباح صافية بقيمة <span class="text-green-400 font-bold">15%</span> لجميع الحسابات النشطة حياً.</p>
+            <button onclick="triggerMagicButton()" id="magicBtn" class="w-full bg-yellow-500 text-black font-bold p-4 rounded-xl text-md">
+                🚀 تفعيل الصفقة وضخ الأرباح الحية
+            </button>
+            <div id="magicStatus" class="text-xs hidden p-3 rounded-xl bg-black border border-gray-800 text-yellow-400"></div>
+        </div>
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ متصل بقاعدة البيانات السحابية بنجاح!'))
-  .catch(err => console.error('❌ خطأ في الاتصال بقاعدة البيانات:', err));
+        <!-- شاشة مراقبة طلبات الإيداع -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
+            <h2 class="text-md font-bold text-gray-400 mb-4">📑 طلبات الإيداع الحالية (حياً من قاعدة البيانات)</h2>
+            <div id="txList" class="space-y-3 text-sm">
+                <p class="text-gray-500 italic text-center py-4">جاري فحص وجلب الطلبات الحية من السيرفر...</p>
+            </div>
+        </div>
+    </div>
 
-// ==========================================
-// تصميم جداول البيانات (Schemas) للأمان الصارم
-// ==========================================
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  balance: { type: Number, default: 0 },
-  isBotActive: { type: Boolean, default: false },
-  referredBy: { type: String, default: "" }
-});
-const User = mongoose.model('User', userSchema);
+    <script>
+        const BACKEND_URL = "https://onrender.com"; 
 
-const txSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  type: { type: String, required: true }, // deposit أو withdraw
-  amount: { type: Number, required: true },
-  cryptoAddress: { type: String, required: true },
-  status: { type: String, default: 'pending' }, // pending, approved, rejected
-  createdAt: { type: Date, default: Date.now }
-});
-const Transaction = mongoose.model('Transaction', txSchema);
+        async function fetchLiveRequests() {
+            const txListDiv = document.getElementById('txList');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/requests`);
+                const requests = await response.json();
 
-// ==========================================
-// برمجة العمليات المباشرة (APIs)
-// ==========================================
+                if (requests.length === 0) {
+                    txListDiv.innerHTML = `<p class="text-gray-500 italic text-center py-4">🟢 لا توجد أي طلبات إيداع معلقة حالياً.</p>`;
+                    return;
+                }
 
-// أ: استقبال طلبات الإيداع من المشتركين (فلتر 100 USDT)
-app.post('/api/finance/deposit', async (req, res) => {
-  try {
-    const { username, amount, cryptoAddress } = req.body;
-    
-    if (Number(amount) < 100) {
-      return res.status(400).json({ error: "خطأ: الحد الأدنى للإيداع هو 100 USDT!" });
-    }
-
-    // صمام أمان لتسجيل الحساب تلقائياً إن لم يكن موجوداً لتسهيل الاختبار
-    let user = await User.findOne({ username });
-    if (!user) {
-      user = new User({ username, password: "default_hashed_password" });
-      await user.save();
-    }
-
-    const newTx = new Transaction({ username, type: 'deposit', amount: Number(amount), cryptoAddress, status: 'pending' });
-    await newTx.save();
-    res.status(200).json({ message: "تم تسجيل طلب الإيداع وهو قيد المراجعة الآن من المشرف." });
-  } catch (err) {
-    res.status(500).json({ error: "خطأ أثناء معالجة طلب الإيداع" });
-  }
-});
-
-// ب: إرسال الطلبات المعلقة لشاشة المشرف
-app.get('/api/admin/requests', async (req, res) => {
-  try {
-    const pendingRequests = await Transaction.find({ status: 'pending' }).sort({ createdAt: -1 });
-    res.status(200).json(pendingRequests);
-  } catch (err) {
-    res.status(500).json({ error: "خطأ أثناء جلب طلبات السيرفر" });
-  }
-});
-
-// ج: معالجة قرار المشرف (موافقة أو رفض) وتحديث رصيد العميل المحدد فوراً حياً
-app.post('/api/admin/action', async (req, res) => {
-  try {
-    const { id, action } = req.body; // معرف العملية الفريد وقرار المشرف
-    
-    const tx = await Transaction.findById(id);
-    if (!tx) return res.status(404).json({ error: "الطلب غير موجود أو تمت معالجته مسبقاً!" });
-
-    if (action === 'approve') {
-      tx.status = 'approved';
-      // تحديث رصيد العميل وتنشيط البوت له داخل السيرفر
-      await User.findOneAndUpdate(
-        { username: tx.username },
-        { \(inc: { balance: tx.amount },\)set: { isBotActive: true } }
-      );
-    } else {
-      tx.status = 'rejected';
-    }
-
-    await tx.save();
-    res.status(200).json({ message: `تمت معالجة الطلب بنجاح وتحويل حالته إلى: ${action}` });
-  } catch (err) {
-    res.status(500).json({ error: "خطأ أثناء تحديث حالة العملية" });
-  }
-});
-
-// د: زر الصفقة السحري اليومي للمشرف (إضافة 15% وعمولة الإحالة 20%)
-app.post('/api/admin/magic-button', async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    const activeUsers = allUsers.filter(u => u.balance > 0);
-
-    for (let user of activeUsers) {
-      const dailyProfit = user.balance * 0.15;
-      user.balance += dailyProfit;
-      await user.save();
-
-      if (user.referredBy) {
-        const referrer = await User.findOne({ username: user.referredBy });
-        if (referrer) {
-          const referralBonus = dailyProfit * 0.20;
-          referrer.balance += referralBonus;
-          await referrer.save();
+                txListDiv.innerHTML = ""; 
+                requests.forEach(req => {
+                    txListDiv.innerHTML += `
+                        <div class="p-4 bg-black rounded-xl border border-gray-800 flex justify-between items-center shadow-md">
+                            <div>
+                                <p class="text-yellow-400 font-bold">👤 العميل: ${req.username}</p>
+                                <p class="text-xs text-gray-400 mt-1">💰 المبلغ: <span class="text-green-400 font-bold">${req.amount} USDT</span></p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="processRequest('${req._id}', 'approve')" class="bg-green-600 text-white font-bold px-3 py-2 rounded-lg text-xs">موافقة وتحديث الحساب</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                txListDiv.innerHTML = `<p class="text-red-400 text-center text-xs">❌ خطأ في جلب البيانات تلقائياً...</p>`;
+            }
         }
-      }
-    }
-    res.status(200).json({ message: "🚀 تم ضغط الزر السحري! وزعت أرباح 15% وعمولات الإحالة 20% بنجاح حيوي!" });
-  } catch (err) {
-    res.status(500).json({ error: "خطأ أثناء تنفيذ الصفقة السحرية الجماعية" });
-  }
-});
 
-// تشغيل السيرفر
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 السيرفر يعمل الآن بأمان على المنفذ ${PORT}`));
+        async function processRequest(id, action) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/action`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, action })
+                });
+                if(response.ok) {
+                    alert("✅ تم تفعيل حساب العميل بنجاح حقيقي!");
+                    fetchLiveRequests();
+                }
+            } catch (err) {
+                alert("❌ فشل الاتصال بالسيرفر.");
+            }
+        }
         
+        fetchLiveRequests();
+        setInterval(fetchLiveRequests, 5000);
+
+        async function triggerMagicButton() {
+            const magicBtn = document.getElementById('magicBtn');
+            const statusDiv = document.getElementById('magicStatus');
+
+            if(!confirm("هل أنت متأكد من رغبتك في ضخ أرباح اليوم بنسبة 15%؟")) return;
+
+            magicBtn.disabled = true;
+            statusDiv.classList.remove('hidden');
+            statusDiv.innerText = "جاري الضخ الجماعي الحسابي...";
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/magic-button`, { method: 'POST' });
+                if(response.ok) {
+                    statusDiv.innerText = "✅ نجح ضخ الأرباح والعمولات للملايين حياً!";
+                }
+            } catch (err) {
+                statusDiv.innerText = "❌ فشل تنفيذ العملية الجماعية السحابية.";
+            } finally {
+                magicBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

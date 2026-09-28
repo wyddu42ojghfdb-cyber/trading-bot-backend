@@ -1,116 +1,138 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف - الإدارة الاستراتيجية</title>
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>لوحة تحكم المشرف المركزي</title>
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #060b13; color: #f3f4f6; }
+        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 15px; text-align: center; }
+        .card { background-color: #151d30; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #233253; }
+        button { width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-magic { background: #fd7e14; color: white; font-size: 16px; box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3); }
+        .btn-approve { background: #28a745; color: white; width: 45%; margin: 2%; display: inline-block; padding: 8px; }
+        .btn-reject { background: #dc3545; color: white; width: 45%; margin: 2%; display: inline-block; padding: 8px; }
+        .val { font-size: 24px; color: #ffc107; margin-top: 5px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        th, td { padding: 10px; border: 1px solid #233253; text-align: center; }
+        th { background: #1f2b45; color: #4e97ff; }
+        .status-box { background: #1f2b45; padding: 10px; border-radius: 5px; margin-top: 5px; display: inline-block; width: 45%; margin-right: 2%; }
+        input { background: #0b0f19; color: white; border: 1px solid #233253; padding: 6px; border-radius: 4px; text-align: center; width: 80px; }
     </style>
 </head>
-<body class="p-4 bg-black">
+<body>
 
-    <div class="max-w-2xl mx-auto space-y-6 mt-4">
-        <!-- هيدر التحكم -->
-        <div class="bg-gray-900 p-6 rounded-2xl border border-red-900 shadow-2xl text-center">
-            <h1 class="text-xl font-bold text-red-400 mb-1">🛡️ غرفة التحكم والمراقبة المركزية</h1>
-            <p class="text-xs text-gray-500">خاص بالمشرفين - إدارة العمليات الحية لـ ملايين المشتركين</p>
-        </div>
+    <div class="card" style="border-color: #fd7e14;">
+        <h2>⚙️ لوحة تتبع وإدارة عمليات المنصة الحية</h2>
+        <button class="btn-magic" onclick="triggerMagic()">🚀 تفعيل وتوزيع أرباح الصفقة الحالية (+15%)</button>
+    </div>
 
-        <!-- زر الصفقة السحري اليومي -->
-        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl text-center space-y-4">
-            <h2 class="text-lg font-bold text-yellow-400">⚡ زر الصفقة السحري اليومي</h2>
-            <p class="text-xs text-gray-400">اضغط لضخ أرباح صافية بقيمة <span class="text-green-400 font-bold">15%</span> لجميع الحسابات النشطة حياً.</p>
-            <button onclick="triggerMagicButton()" id="magicBtn" class="w-full bg-yellow-500 text-black font-bold p-4 rounded-xl text-md">
-                🚀 تفعيل الصفقة وضخ الأرباح الحية
-            </button>
-            <div id="magicStatus" class="text-xs hidden p-3 rounded-xl bg-black border border-gray-800 text-yellow-400"></div>
-        </div>
+    <div class="card">
+        <span>📊 إحصائيات النشاط العام للمشتركين الحالية:</span>
+        <br>
+        <div class="status-box">🟢 نشط: <span id="activeCount" style="color:#28a745; font-weight:bold;">0</span></div>
+        <div class="status-box">🔴 غير نشط: <span id="inactiveCount" style="color:#dc3545; font-weight:bold;">0</span></div>
+    </div>
 
-        <!-- شاشة مراقبة طلبات الإيداع -->
-        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
-            <h2 class="text-md font-bold text-gray-400 mb-4">📑 طلبات الإيداع الحالية (حياً من قاعدة البيانات)</h2>
-            <div id="txList" class="space-y-3 text-sm">
-                <p class="text-gray-500 italic text-center py-4">جاري فحص وجلب الطلبات الحية من السيرفر...</p>
-            </div>
-        </div>
+    <div class="card" style="border-color: #4e97ff;">
+        <h3>📥 طلبات الأعضاء المعلقة الحالية (إيداع / سحب / مكافآت):</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم العضو</th>
+                    <th>نوع الطلب</th>
+                    <th>المبلغ / التفاصيل</th>
+                    <th>المحفظة الذكية (TRC-20)</th>
+                    <th>التحكم والموافقة</th>
+                </tr>
+            </thead>
+            <tbody id="requestTable">
+                <tr><td colspan="5">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
-        const BACKEND_URL = "https://onrender.com"; 
-
-        async function fetchLiveRequests() {
-            const txListDiv = document.getElementById('txList');
+        async function fetchAdminData() {
             try {
-                const response = await fetch(`${BACKEND_URL}/api/admin/requests`);
-                const requests = await response.json();
+                var statsRes = await fetch('/api/admin/stats');
+                var stats = await statsRes.json();
+                document.getElementById('activeCount').textContent = stats.active;
+                document.getElementById('inactiveCount').textContent = stats.inactive;
 
-                if (requests.length === 0) {
-                    txListDiv.innerHTML = `<p class="text-gray-500 italic text-center py-4">🟢 لا توجد أي طلبات إيداع معلقة حالياً.</p>`;
-                    return;
+                var reqRes = await fetch('/api/admin/requests/pending');
+                var reqData = await reqRes.json();
+                var tableBody = document.getElementById('requestTable');
+                tableBody.innerHTML = '';
+
+                if (reqData.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</td></tr>';
+                } else {
+                    reqData.forEach(function(item) {
+                        var typeText = '';
+                        var detailsText = item.amount + ' USDT';
+                        
+                        if (item.type === 'deposit') typeText = '📥 إيداع رأس مال';
+                        if (item.type === 'balance') typeText = '💸 سحب كلي';
+                        if (item.type === 'today') typeText = '📈 سحب أرباح اليوم';
+                        if (item.type === 'referral') typeText = '👥 سحب أرباح دعوة';
+                        if (item.type === 'referral_bonus') {
+                            typeText = '🎁 طلب مكافأة دعوة';
+                            detailsText = 'دعا العضو: <span style="color:#ffc107;">' + item.invitedUser + '</span>';
+                        }
+
+                        var walletText = item.wallet ? item.wallet : '---';
+                        var actionHtml = '';
+
+                        if (item.type === 'referral_bonus') {
+                            actionHtml = '<input type="number" id="bonus_' + item.id + '" placeholder="المكافأة" value="10"> ' +
+                                         '<br><button class="btn-approve" onclick="processRequest(' + item.id + ', \'approve\')">موافق</button>' +
+                                         '<button class="btn-reject" onclick="processRequest(' + item.id + ', \'reject\')">رفض</button>';
+                        } else {
+                            actionHtml = '<button class="btn-approve" onclick="processRequest(' + item.id + ', \'approve\')">موافق</button>' +
+                                         '<button class="btn-reject" onclick="processRequest(' + item.id + ', \'reject\')">رفض</button>';
+                        }
+
+                        tableBody.innerHTML += '<tr>' +
+                            '<td style="font-weight:bold; color:#4e97ff;">' + item.username + '</td>' +
+                            '<td>' + typeText + '</td>' +
+                            '<td>' + detailsText + '</td>' +
+                            '<td style="color:#ffc107; font-family:monospace; font-size:11px;">' + walletText + '</td>' +
+                            '<td>' + actionHtml + '</td>' +
+                            '</tr>';
+                    });
                 }
-
-                txListDiv.innerHTML = ""; 
-                requests.forEach(req => {
-                    txListDiv.innerHTML += `
-                        <div class="p-4 bg-black rounded-xl border border-gray-800 flex justify-between items-center shadow-md">
-                            <div>
-                                <p class="text-yellow-400 font-bold">👤 العميل: ${req.username}</p>
-                                <p class="text-xs text-gray-400 mt-1">💰 المبلغ: <span class="text-green-400 font-bold">${req.amount} USDT</span></p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="processRequest('${req._id}', 'approve')" class="bg-green-600 text-white font-bold px-3 py-2 rounded-lg text-xs">موافقة وتحديث الحساب</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                txListDiv.innerHTML = `<p class="text-red-400 text-center text-xs">❌ خطأ في جلب البيانات تلقائياً...</p>`;
-            }
+            } catch (e) { console.error("خطأ في جلب بيانات المشرف:", e); }
         }
 
         async function processRequest(id, action) {
+            var bonusInput = document.getElementById('bonus_' + id);
+            var customBonus = bonusInput ? bonusInput.value : 0;
+
             try {
-                const response = await fetch(`${BACKEND_URL}/api/admin/action`, {
+                var res = await fetch('/api/admin/process-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, action })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id: id, action: action, customBonus: customBonus })
                 });
-                if(response.ok) {
-                    alert("✅ تم تفعيل حساب العميل بنجاح حقيقي!");
-                    fetchLiveRequests();
-                }
-            } catch (err) {
-                alert("❌ فشل الاتصال بالسيرفر.");
-            }
+                var data = await res.json();
+                alert(data.message);
+                fetchAdminData();
+            } catch (e) { alert("فشلت العملية"); }
         }
-        
-        fetchLiveRequests();
-        setInterval(fetchLiveRequests, 5000);
 
-        async function triggerMagicButton() {
-            const magicBtn = document.getElementById('magicBtn');
-            const statusDiv = document.getElementById('magicStatus');
-
-            if(!confirm("هل أنت متأكد من رغبتك في ضخ أرباح اليوم بنسبة 15%؟")) return;
-
-            magicBtn.disabled = true;
-            statusDiv.classList.remove('hidden');
-            statusDiv.innerText = "جاري الضخ الجماعي الحسابي...";
-
+        async function triggerMagic() {
+            if (!confirm("هل أنت متأكد من رغبتك في توزيع أرباح بنسبة 15% على جميع الأعضاء النشطين الآن؟")) return;
             try {
-                const response = await fetch(`${BACKEND_URL}/api/admin/magic-button`, { method: 'POST' });
-                if(response.ok) {
-                    statusDiv.innerText = "✅ نجح ضخ الأرباح والعمولات للملايين حياً!";
-                }
-            } catch (err) {
-                statusDiv.innerText = "❌ فشل تنفيذ العملية الجماعية السحابية.";
-            } finally {
-                magicBtn.disabled = false;
-            }
+                var res = await fetch('/api/admin/magic-button', { method: 'POST' });
+                var data = await res.json();
+                alert(data.message);
+                fetchAdminData();
+            } catch (e) { alert("فشلت عملية توزيع الأرباح"); }
         }
+
+        fetchAdminData();
+        setInterval(fetchAdminData, 3000);
     </script>
 </body>
 </html>

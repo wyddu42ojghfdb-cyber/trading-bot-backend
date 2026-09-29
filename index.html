@@ -3,239 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التداول الذكية</title>
+    <title>لوحة تحكم المشرف</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b111e;
-            color: #ffffff;
-            margin: 0;
-            padding: 15px;
-            direction: rtl;
-        }
-        .section-card {
-            background-color: #111a2e;
-            border: 1px solid #1e2d4a;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .section-title {
-            font-size: 14px;
-            color: #90a4ae;
-            margin-top: 0;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .value-display {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00c853;
-            text-align: left;
-            margin: 5px 0;
-        }
-        .btn-action {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-        .btn-action:hover { opacity: 0.9; }
-        .btn-purple { background-color: #7b1fa2; color: white; }
-        .btn-red { background-color: #d32f2f; color: white; }
-        .btn-orange { background-color: #f57c00; color: white; }
-        .btn-blue { background-color: #1976d2; color: white; padding: 10px; font-size: 13px; margin-top: 5px; }
-        .btn-support { 
-            background-color: #0088cc; 
-            color: white; 
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            background: #0b111e;
-            border: 1px solid #1e2d4a;
-            border-radius: 4px;
-            color: #fff;
-            box-sizing: border-box;
-            margin-bottom: 5px;
-            text-align: right;
-            font-size: 14px;
-        }
-        input:focus {
-            outline: none;
-            border-color: #2196f3;
-        }
-        .wallet-box {
-            background: #0b111e;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            color: #ffb74d;
-            text-align: center;
-            word-break: break-all;
-        }
-        .username-display {
-            font-size: 18px;
-            font-weight: bold;
-            color: #4fc3f7;
-            margin-bottom: 8px;
-        }
+        :root { --primary-color: #00c853; --danger-color: #b71c1c; --bg-color: #121212; --card-bg: #1e1e1e; --gold-color: #ffd600;}
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; padding: 20px; display: flex; justify-content: center; }
+        .admin-container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .status-badge { display: inline-block; background: #1b5e20; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; }
+        .btn-broadcast { width: 100%; padding: 15px; background-color: var(--gold-color); color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255,214,0,0.2); }
+        .request-card { background: #2a2a2a; border-left: 4px solid var(--primary-color); padding: 18px; border-radius: 8px; margin-bottom: 15px; }
+        .wallet-container { background: #111; padding: 10px; border-radius: 6px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-status { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-approve { background-color: #2e7d32; color: white; }
+        .btn-reject { background-color: #c62828; color: white; }
+        .btn-clear { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <!-- 👤 قسم اسم المستخدم الحالي المطور برمجياً مع ميزة الكتابة والحفظ -->
-    <div class="section-card">
-        <div class="section-title">👤 اسم المستخدم الحالي:</div>
-        <div class="username-display" id="currentUsernameText">لاعب حقيقي</div>
-        <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا لتغييره...">
-        <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت اسم العضو</button>
+<div class="admin-container">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2>لوحة تتبع المعاملات السحابية الحية</h2>
+        <div class="status-badge">🟢 متصل بشبكة جوجل الدائمة (Firebase)</div>
     </div>
 
-    <!-- 🏆 الجائزة الكبرى -->
-    <div class="section-card">
-        <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
-        <div class="value-display" style="color: #2196f3;">2500 دولار أمريكي</div>
-        <div style="font-size: 12px; color: #90a4ae;">أعضاء فريقك: 0 / 40</div>
-    </div>
-
-    <!-- 🔗 تقديم طلب مكافأة دعوة -->
-    <div class="section-card">
-        <div class="section-title">🔗 أرسل طلباً للحصول على مكافأة الدعوة الخاصة بك:</div>
-        <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
-        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 أرسل الطلب إلى مشرفك</button>
-    </div>
-
-    <!-- 💰 أرصدة رأس المال والأرباح المحدثة تلقائياً -->
-    <div class="section-card">
-        <div class="section-title">💰 إجمالي رأس المال:</div>
-        <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">📊 أرباح اليوم:</div>
-        <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">👥 أرباح تذاكر الدعوة:</div>
-        <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
-
-    <!-- 🚨 لوحة عمليات السحب الفورية والآمنة -->
-    <div class="section-card" style="border-color: #d32f2f;">
-        <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية والآمنة (شبكة TRC-20 حصراً):</div>
-        <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
-        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية لشبكة TRC-20">
-        <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
-        <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
-        <button class="btn-action btn-purple" onclick="handleTransaction('سحب أرباح الدعوة', 'withdrawAmount', 'withdrawWallet')">سحب أرباح الدعوة</button>
-    </div>
-
-    <!-- 📥 طلب إيداع رأس المال -->
-    <div class="section-card" style="border-color: #f57c00;">
-        <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
-        <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
-        <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم نسخ العنوان!')">📋 نسخ عنوان المحفظة تلقائياً</button>
-        <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل (مثال: 100)" style="margin-top: 15px;">
-        <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
-    </div>
-
-    <!-- 📞 تواصل مع الدعم الفني عبر تليجرام -->
-    <a href="https://t.me" target="_blank" class="btn-action btn-support">
-        🚀 تواصل مع الدعم الفني عبر تليجرام
-    </a>
+    <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
+    <div id="requestsContainer"></div>
+    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة وتصفير السجلات</button>
+</div>
 
 <script>
-    // دالة لحفظ وتثبيت اسم العضو المكتوب حياً في الصفحة
-    function saveUsername() {
-        const name = document.getElementById('usernameInput').value.trim();
-        if(!name) {
-            alert('يرجى كتابة اسم العضو أولاً قبل الضغط على حفظ.');
-            return;
-        }
-        localStorage.setItem('saved_user_name', name);
-        document.getElementById('currentUsernameText').innerText = name;
-        document.getElementById('usernameInput').value = '';
-        alert('✅ تم تثبيت وتحديث اسم العضو بنجاح في المنصة!');
+    const dbUrl = 'https://firebaseio.com';
+
+    function loadAdminRequests() {
+        fetch(`${dbUrl}/orders.json`)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('requestsContainer');
+            container.innerHTML = '';
+            if(!data) { container.innerHTML = '<p style="text-align:center; color:#aaa;">شاشات المراقبة نظيفة، لا توجد طلبات</p>'; return; }
+
+            Object.keys(data).reverse().forEach(key => {
+                const req = data[key];
+                const typeColor = req.type.includes('سحب') ? '#ff5252' : '#00e676';
+                
+                const cardHtml = `
+                    <div class="request-card" style="border-left-color: ${typeColor}">
+                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}">${req.type}</span></p>
+                        <p><strong>المبلغ:</strong> ${req.amount} USDT</p>
+                        <div class="wallet-container">
+                            <span style="font-size:13px; color:#ffb74d; word-break:break-all;">${req.wallet}</span>
+                            <button style="padding:4px 8px; background:#444; color:#fff; border:none; cursor:pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ')">نسخ</button>
+                        </div>
+                        <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
+                            <button class="btn-status btn-approve" onclick="updateStatus('${key}', 'تم القبول', '${req.type}', ${req.amount})">موافق 👍</button>
+                            <button class="btn-status btn-reject" onclick="updateStatus('${key}', 'تم الرفض')">رفض 👎</button>
+                        </div>
+                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة: <strong>${req.status}</strong> | التوقيت: ${req.date}</p>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        });
     }
 
-    // استدعاء الاسم المكتوب مسبقاً لعرضه فور فتح التطبيق
-    function loadSavedUsername() {
-        const savedName = localStorage.getItem('saved_user_name');
-        if(savedName) {
-            document.getElementById('currentUsernameText').innerText = savedName;
-        } else {
-            document.getElementById('currentUsernameText').innerText = 'لاعب حقيقي';
+    function updateStatus(key, newStatus, type, amount) {
+        // تحديث حالة الطلب في قاعدة البيانات فوراً
+        fetch(`${dbUrl}/orders/${key}.json`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(() => {
+            if (newStatus === 'تم القبول') {
+                // جلب الأرصدة الحالية لتعديلها بناءً على نوع الطلب المقبول
+                fetch(`${dbUrl}/balances.json`)
+                .then(res => res.json())
+                .then(balance => {
+                    let current = balance || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+                    const numAmount = parseFloat(amount) || 0;
+
+                    if (type === 'إيداع') current.capital += numAmount;
+                    else if (type === 'سحب كلّي') current.capital = 0;
+                    else if (type === 'سحب اليوم') current.todayProfit -= numAmount;
+
+                    fetch(`${dbUrl}/balances.json`, { method: 'PUT', body: JSON.stringify(current) });
+                });
+            }
+            setTimeout(loadAdminRequests, 500);
+        });
+    }
+
+    function broadcastTodayProfit() {
+        fetch(`${dbUrl}/balances.json`)
+        .then(res => res.json())
+        .then(balance => {
+            let current = balance || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+            if (current.capital <= 0) return alert('رأس مال المشتركين صفر!');
+            
+            const profit = current.capital * 0.15;
+            current.todayProfit += profit;
+
+            fetch(`${dbUrl}/balances.json`, { method: 'PUT', body: JSON.stringify(current) })
+            .then(() => alert(`تم بث أرباح الصفقة اليومية 15% بمجموع مضاف: ${profit.toFixed(2)} USDT`));
+        });
+    }
+
+    function clearAllRequests() {
+        if(confirm('تأكيد مسح كافة سجلات لوحة التحكم نهائياً؟')) {
+            fetch(`${dbUrl}/orders.json`, { method: 'DELETE' }).then(() => loadAdminRequests());
         }
     }
 
-    // جلب وتحديث قيم المحفظة والأرصدة من الذاكرة المشتركة
-    function updateLiveBalances() {
-        const balance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
-        document.getElementById('displayCapital').innerText = `USDT ${balance.capital.toFixed(2)}`;
-        document.getElementById('displayTodayProfit').innerText = `USDT ${balance.todayProfit.toFixed(2)}`;
-        document.getElementById('displayInviteProfit').innerText = `USDT ${balance.inviteProfit.toFixed(2)}`;
-    }
-
-    // إرسال البيانات المالية والطلبات الحية مباشرة للمشرف
-    function handleTransaction(actionType, amountId, walletId) {
-        const amount = document.getElementById(amountId).value;
-        const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
-
-        if(!amount || !wallet) {
-            alert('يرجى ملء جميع الحقول المطلوبة أولاً.');
-            return;
-        }
-
-        const newRequest = {
-            id: Date.now(),
-            amount: amount,
-            wallet: `${wallet} (اسم العضو: ${currentUser})`,
-            type: actionType,
-            status: 'معلق',
-            date: new Date().toLocaleString('ar-EG')
-        };
-
-        let localData = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        localData.push(newRequest);
-        localStorage.setItem('admin_orders', JSON.stringify(localData));
-
-        alert(`🎯 تم إرسال طلب (${actionType}) للمشرف بنجاح!`);
-        if(amountId !== 'adminWalletAddress') {
-            document.getElementById(amountId).value = '';
-        }
-    }
-
-    function sendInviteRequest() {
-        const memberName = document.getElementById('inviteMemberName').value.trim();
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
-        
-        if(!memberName) {
-            alert('يرجى كتابة اسم العضو أولاً.');
-            return;
-        }
-        
-        const newRequest = {
-            id: Date.now(),
-            amount: 'طلب مكافأة',
-            wallet: `العضو المدعو: ${memberName} (بواسطة: ${currentUser})`,
-            type: 'مكافأة دعوة',
-            status: 'معلق',
-            date: new Date().toLocaleString('ar-EG')
-        };
-        
-        let localData = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        
+    setInterval(loadAdminRequests, 2000);
+    window.onload = loadAdminRequests;
+</script>
+</body>
+</html>

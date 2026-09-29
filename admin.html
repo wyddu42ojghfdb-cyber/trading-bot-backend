@@ -3,288 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف - مراقبة المعاملات الحية</title>
+    <title>لوحة تحكم المشرف - بث المعاملات الحية</title>
     <style>
-        :root {
-            --primary-color: #00c853;
-            --danger-color: #b71c1c;
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --text-muted: #aaaaaa;
-            --gold-color: #ffd600;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .admin-container {
-            width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        .admin-header {
-            text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #3a3a3a;
-            padding-bottom: 15px;
-        }
-
-        .admin-header h1 {
-            font-size: 24px;
-            color: var(--primary-color);
-            margin: 0 0 5px 0;
-        }
-
-        .admin-header p {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: #1b5e20;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .btn-broadcast {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--gold-color);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(255, 214, 0, 0.2);
-        }
-
-        .btn-broadcast:hover { background-color: #ffea00; }
-
-        .requests-list {
-            margin-top: 20px;
-            min-height: 150px;
-        }
-
-        .request-card {
-            background: #2a2a2a;
-            border-left: 4px solid var(--primary-color);
-            padding: 18px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            text-align: right;
-        }
-
-        .request-card.withdraw-type {
-            border-left-color: var(--danger-color);
-        }
-
-        .request-card p {
-            margin: 8px 0;
-            font-size: 15px;
-        }
-
-        .wallet-container {
-            background: #111;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #3a3a3a;
-            margin: 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .wallet-text {
-            font-family: monospace;
-            font-size: 14px;
-            color: #ffb74d;
-            word-break: break-all;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-status {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-size: 14px;
-        }
-
+        :root { --primary-color: #00c853; --danger-color: #b71c1c; --bg-color: #121212; --card-bg: #1e1e1e; --gold-color: #ffd600;}
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; padding: 20px; display: flex; justify-content: center; }
+        .admin-container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .status-badge { display: inline-block; background: #1b5e20; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; font-weight: bold; }
+        .btn-broadcast { width: 100%; padding: 15px; background-color: var(--gold-color); color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255,214,0,0.2); }
+        .request-card { background: #2a2a2a; border-left: 4px solid var(--primary-color); padding: 18px; border-radius: 8px; margin-bottom: 15px; text-align: right; }
+        .wallet-container { background: #111; padding: 10px; border-radius: 6px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-status { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-approve { background-color: #2e7d32; color: white; }
-        .btn-approve:hover { background-color: #1b5e20; }
-        
         .btn-reject { background-color: #c62828; color: white; }
-        .btn-reject:hover { background-color: #b71c1c; }
-
-        .request-meta {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-top: 12px;
-            border-top: 1px solid #3a3a3a;
-            padding-top: 8px;
-        }
-
-        .btn-clear {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1px solid var(--danger-color);
-            color: var(--danger-color);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-        }
-
-        .btn-clear:hover { background: var(--danger-color); color: #fff; }
-
-        .empty-message {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 40px 0;
-            font-style: italic;
-        }
-
-        .copy-btn {
-            background: #0088cc;
-            border: none;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .btn-clear { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="admin-container">
-    <div class="admin-header">
-        <h1>لوحة تتبع المعاملات الحية</h1>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2>لوحة تتبع المعاملات الحية بين الأجهزة</h2>
         <div id="orderCount" style="font-size: 14px; color: #4fc3f7; margin-bottom: 10px; font-weight: bold;">إجمالي طلبات المنصة: 0</div>
-        <div id="liveStatus" class="status-badge" style="background-color: #1b5e20;">🟢 متصل ومستقر 100% (اتصال حي)</div>
+        <div class="status-badge">🟢 قناة ربط سحابية نشطة ودائمة</div>
     </div>
 
-    <!-- 📊 زر توزيع أرباح الـ 15% المباشر للبث السحابي -->
     <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
-
-    <!-- قائمة عرض الطلبات المستلمة حياً -->
-    <div class="requests-list" id="requestsContainer">
-        <div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>
-    </div>
-
-    <!-- زر تنظيف اللوحة -->
-    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة ومسح السجلات</button>
+    <div id="requestsContainer"></div>
+    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة وتصفير السجلات</button>
 </div>
 
 <script>
-    // 🌐 شبكة ربط برمجية دائمة ومجانية ومستقرة تماماً تتبع لجوجل لمنع الأخطاء الحمراء
-    const dbUrl = 'https://firebaseio.com';
+    // قناة ربط برمجية مشتركة ومفتوحة تعمل وسيطاً لنقل البيانات حياً بين الأجهزة المختلفة
+    const channelUrl = 'https://jsonbin.io';
+    const apiKey = '\$2a\$10\$7R4b6/nJv/GskcZ.vNlO2uTskK0Jq6b19H7H9YhM8rR4n3CExZ6vS'; // مفتاح عبور آمن مفتوح
 
     function checkAdminAuth() {
-        const correctUser = "admin";
-        const correctPass = "admin123";
-
-        // فحص الجلسة إذا كان والدك مسجل الدخول بالفعل
-        if (sessionStorage.getItem('is_logged_in') === 'true') {
+        if (sessionStorage.getItem('is_admin_auth') === 'true') {
             loadAdminRequests();
-            setInterval(loadAdminRequests, 2500);
+            setInterval(loadAdminRequests, 3000);
             return;
         }
-
-        const inputUser = prompt("الرجاء إدخال اسم المستخدم للمشرف:");
-        const inputPass = prompt("الرجاء إدخال كلمة المرور السرية:");
-
-        if (inputUser === correctUser && inputPass === correctPass) {
-            sessionStorage.setItem('is_logged_in', 'true');
+        const user = prompt("اسم المستخدم للمشرف:");
+        const pass = prompt("كلمة المرور السرية:");
+        if (user === "admin" && pass === "admin123") {
+            sessionStorage.setItem('is_admin_auth', 'true');
             loadAdminRequests();
-            setInterval(loadAdminRequests, 2500);
+            setInterval(loadAdminRequests, 3000);
         } else {
-            alert("❌ بيانات الدخول خاطئة!");
-            window.location.href = "index.html"; 
+            alert("بيانات خاطئة!");
+            window.location.href = "index.html";
         }
     }
 
     function loadAdminRequests() {
-        fetch(`${dbUrl}/orders.json`)
+        fetch(channelUrl, { headers: { 'X-Master-Key': apiKey } })
         .then(res => res.json())
-        .then(data => {
+        .then(resData => {
+            const serverData = resData.record || { orders: [], balances: { capital: 0, todayProfit: 0, inviteProfit: 0 } };
+            const orders = serverData.orders || [];
+            
+            document.getElementById('orderCount').innerText = `إجمالي طلبات المنصة: ${orders.length}`;
             const container = document.getElementById('requestsContainer');
             container.innerHTML = '';
-            
-            if(!data) { 
-                document.getElementById('orderCount').innerText = "إجمالي طلبات المنصة: 0";
-                container.innerHTML = '<div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>'; 
-                return; 
+
+            if(orders.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#aaa; font-style:italic;">شاشات المراقبة نظيفة، لا توجد طلبات</p>';
+                return;
             }
 
-            const keys = Object.keys(data);
-            document.getElementById('orderCount').innerText = `إجمالي طلبات المنصة: ${keys.length}`;
-
-            keys.reverse().forEach(key => {
-                const req = data[key];
-                const isWithdraw = req.type && req.type.includes('سحب');
-                const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
-                const typeColor = isWithdraw ? '#ff5252' : '#00e676';
+            [...orders].reverse().forEach((req, index) => {
+                const actualIndex = orders.length - 1 - index;
+                const typeColor = req.type.includes('سحب') ? '#ff5252' : '#00e676';
                 
-                let statusIcon = '⏳';
-                let statusColor = '#fff';
-                if (req.status === 'تم القبول') { statusIcon = '✅'; statusColor = '#00e676'; }
-                if (req.status === 'تم الرد') { statusIcon = '❌'; statusColor = '#ff5252'; }
-
                 const cardHtml = `
-                    <div class="${cardClass}">
+                    <div class="request-card" style="border-left-color: ${typeColor}">
                         <p><strong>اسم العضو:</strong> <span style="color: #4fc3f7; font-weight: bold;">${req.username || 'لاعب حقيقي'}</span></p>
-                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
-                        <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
-                        
+                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}">${req.type}</span></p>
+                        <p><strong>المبلغ:</strong> ${req.amount} USDT</p>
                         <div class="wallet-container">
-                            <div class="wallet-text">${req.wallet}</div>
-                            <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ عنوان المحفظة بنجاح!')">📋 نسخ</button>
+                            <span style="font-size:13px; color:#ffb74d; word-break:break-all;">${req.wallet}</span>
+                            <button style="padding:4px 8px; background:#444; color:#fff; border:none; cursor:pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ!')">نسخ</button>
                         </div>
-
                         <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
-                            <button class="btn-status btn-approve" onclick="updateStatus('${key}', 'تم القبول', '${req.type}', ${req.amount})">موافق 👍</button>
-                            <button class="btn-status btn-reject" onclick="updateStatus('${key}', 'تم الرفض')">رفض 👎</button>
+                            <button class="btn-status btn-approve" onclick="updateStatus(${actualIndex}, 'تم القبول', '${req.type}', ${req.amount}, serverData)">موافق 👍</button>
+                            <button class="btn-status btn-reject" onclick="updateStatus(${actualIndex}, 'تم الرفض', '${req.type}', ${req.amount}, serverData)">رفض 👎</button>
                         </div>
+                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة: <strong>${req.status}</strong> | التوقيت: ${req.date}</p>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        });
+    }
 
-                        <div class="request-meta">
-                            <span>حالة الطلب: <span style="color: ${statusColor}; font-weight: bold;">${statusIcon} ${req.status}</span></span>
-                            
+    function updateStatus(index, newStatus, type, amount, serverData) {
+        serverData.orders[index].status = newStatus;
+
+        if (newStatus === 'تم القبول') {
+            let bal = serverData.balances || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+            const num = parseFloat(amount) || 0;
+            if (type === 'إيداع') bal.capital += num;
+            else if (type === 'سحب كلّي') bal.capital = 0;
+            else if (type === 'سحب اليوم') bal.todayProfit -= num;
+            serverData.balances = bal;
+        }
+
+        saveToServer(serverData);
+    }
+
+    function broadcastTodayProfit() {
+        fetch(channelUrl, { headers: { 'X-Master-Key': apiKey } })
+        .then(res => res.json())
+        .then(resData => {
+            let serverData = resData.record;
+            let bal = serverData.balances || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+            if (bal.capital <= 0) return alert('رأس مال المشتركين صفر!');
+            
+            const profit = bal.capital * 0.15;
+            bal.todayProfit += profit;
+            serverData.balances = bal;
+
+            saveToServer(serverData, `🎯 تم بث أرباح الـ 15% بمجموع مضاف: ${profit.toFixed(2)} USDT`);
+        });
+    }
+
+    function clearAllRequests() {
+        if(confirm('هل تريد تصفير اللوحة؟')) {
+            const freshData = { orders: [], balances: { capital: 0, todayProfit: 0, inviteProfit: 0 } };
+            saveToServer(freshData);
+        }
+    }
+
+    function saveToServer(data, alertMsg = null) {
+        fetch(channelUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
+            body: JSON.stringify(data)
+        }).then(() => {
+            loadAdminRequests();
+            if(alertMsg) alert(alertMsg);
+        });
+    }
+
+    window.onload = checkAdminAuth;
+</script>
+</body>
+</html>

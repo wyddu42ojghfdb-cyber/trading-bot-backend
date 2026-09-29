@@ -8,19 +8,40 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 20px; direction: rtl; }
         .admin-container { max-width: 1000px; margin: 0 auto; }
         h1, h2 { color: #2196f3; border-bottom: 2px solid #1e2d4a; padding-bottom: 10px; }
+        .stats-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+        .stat-card { background-color: #111a2e; padding: 15px; border-radius: 8px; border: 1px solid #1e2d4a; flex: 1; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #4fc3f7; margin-top: 5px; }
+        .profit-action-card { background-color: #1e2d4a; padding: 15px; border-radius: 8px; border: 1px solid #f57c00; margin-bottom: 25px; text-align: center; }
         .order-table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
         th, td { padding: 15px; text-align: right; border-bottom: 1px solid #1e2d4a; }
         th { background-color: #1e2d4a; color: #90a4ae; }
         .btn { padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 5px; }
         .btn-success { background-color: #00e676; color: #000; }
         .btn-danger { background-color: #ff5252; color: #fff; }
+        .btn-copy { background-color: #334155; color: #ffb74d; padding: 4px 8px; font-size: 12px; border-radius: 4px; margin-right: 5px; }
+        .btn-distribute { background-color: #f57c00; color: white; padding: 12px 30px; font-size: 15px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
-        <h1>🖥️ لوحة تحكم المشرف الحقيقية</h1>
+        <h1>🖥️ لوحة تحكم المشرف السحابية</h1>
         
+        <!-- 👥 إظهار عداد إجمالي أعداد المستخدمين المسجلين في المنصة -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div style="color: #90a4ae; font-size: 14px;">👥 إجمالي عدد الأعضاء المسجلين:</div>
+                <div class="stat-value" id="totalUsersCount">0</div>
+            </div>
+        </div>
+
+        <!-- 💰 زر التوزيع اليدوي للأرباح اليومية -->
+        <div class="profit-action-card">
+            <h3 style="margin-top:0; color:#ffb74d;">⚙️ الإجراءات الجماعية اليومية:</h3>
+            <p style="font-size:13px; color:#90a4ae;">الضغط على هذا الزر يضيف ربح 15% فوراً لجميع الحسابات التي تمتلك رأس مال مشحون فقط:</p>
+            <button class="btn btn-distribute" onclick="triggerDailyDistribution()">💰 توزيع الأرباح اليومية المباشرة (15%)</button>
+        </div>
+
         <h2>📥 طلبات الأعضاء المنتظرة</h2>
         <table class="order-table">
             <thead>
@@ -28,20 +49,20 @@
                     <th>اسم المستخدم</th>
                     <th>نوع الطلب</th>
                     <th>المبلغ / التفاصيل</th>
-                    <th>المحفظة / الصديق</th>
-                    <th>القرار</th>
+                    <th>المحفظة / تفاصيل الإرسال (مع إمكانية النسخ)</th>
+                    <th>القرار الرسمي</th>
                 </tr>
             </thead>
             <tbody id="ordersTableBody"></tbody>
         </table>
 
-        <h2>📊 مراقبة أرصدة وأرصدة الأرباح والمكافآت الحالية لكل الأعضاء</h2>
+        <h2>📊 مراقبة أرصدة وأرباح ومميزات الأعضاء حياً</h2>
         <table class="order-table">
             <thead>
                 <tr>
                     <th>اسم المستخدم</th>
                     <th>رأس المال الكلي</th>
-                    <th>أرباح اليوم</th>
+                    <th>أرباح اليوم الحالية 📊</th>
                     <th>أرباح المكافآت 🎁</th>
                     <th>عدد الفريق</th>
                 </tr>
@@ -51,20 +72,29 @@
     </div>
 
 <script>
+    const CLOUD_SERVER_URL = "https://vercel.app";
+
     function refreshLiveAdminData() {
-        // 1. جلب الطلبات المعلقة من السيرفر
-        fetch('http://localhost:3000/api/admin/orders')
+        fetch(`${CLOUD_SERVER_URL}/api/admin/orders`)
         .then(res => res.json())
         .then(orders => {
             const tbody = document.getElementById('ordersTableBody');
             tbody.innerHTML = orders.length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد طلبات معلقة حالياً...</td></tr>` : '';
             orders.forEach(order => {
+                const infoAmount = order.amount ? `${order.amount} USDT` : 'طلب مكافأة';
+                const infoAddress = order.wallet ? order.wallet : `صديق: ${order.friendName}`;
+                
+                // إضافة زر النسخ للمحفظة برمجياً
+                const copyButtonHtml = order.wallet ? `<button class="btn btn-copy" onclick="navigator.clipboard.writeText('${order.wallet}'); alert('تم نسخ عنوان المحفظة!')">📋 نسخ</button>` : '';
+
                 tbody.innerHTML += `
                     <tr>
                         <td style="color:#4fc3f7; font-weight:bold;">${order.username}</td>
                         <td>${order.type}</td>
-                        <td>${order.amount ? order.amount + ' USDT' : 'طلب مكافأة'}</td>
-                        <td>${order.wallet ? order.wallet : order.friendName}</td>
+                        <td>${infoAmount}</td>
+                        <td style="font-family:monospace; color:#ffb74d;">
+                            <span>${infoAddress}</span> ${copyButtonHtml}
+                        </td>
                         <td>
                             <button class="btn btn-success" onclick="takeAction('${order.id}', 'accept')">✅ قبول</button>
                             <button class="btn btn-danger" onclick="takeAction('${order.id}', 'reject')">❌ رفض</button>
@@ -73,18 +103,22 @@
             });
         });
 
-        // 2. جلب الأرصدة المحدثة والأرباح والمكافآت الحية من السيرفر
-        fetch('http://localhost:3000/api/admin/users-profits')
+        fetch(`${CLOUD_SERVER_URL}/api/admin/users-profits`)
         .then(res => res.json())
         .then(users => {
             const tbody = document.getElementById('profitsTableBody');
             tbody.innerHTML = Object.keys(users).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد بيانات مسجلة...</td></tr>` : '';
+            
+            // تحديث عداد أعداد المستخدمين الإجمالي في الواجهة
+            const totalUsers = Object.keys(users).length;
+            document.getElementById('totalUsersCount').innerText = totalUsers;
+
             for (let username in users) {
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${username}</b></td>
                         <td style="color:#ffb74d;">USDT ${users[username].capital.toFixed(2)}</td>
-                        <td style="color:#00e676;">USDT ${users[username].todayProfit.toFixed(2)}</td>
+                        <td style="color:#00e676; font-weight:bold;">USDT ${users[username].todayProfit.toFixed(2)}</td>
                         <td style="color:#ba68c8;">USDT ${users[username].inviteProfit.toFixed(2)}</td>
                         <td>${users[username].teamCount} أعضاء</td>
                     </tr>`;
@@ -92,8 +126,20 @@
         });
     }
 
+    function triggerDailyDistribution() {
+        if(confirm("هل أنت متأكد من رغبتك في توزيع أرباح الـ 15% يدوياً على كافة الحسابات النشطة الآن؟")) {
+            fetch(`${CLOUD_SERVER_URL}/api/admin/distribute-profits`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                refreshLiveAdminData();
+            })
+            .catch(err => alert("فشل إرسال أمر التوزيع."));
+        }
+    }
+
     function takeAction(orderId, action) {
-        fetch('http://localhost:3000/api/admin/action', {
+        fetch(`${CLOUD_SERVER_URL}/api/admin/action`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId, action })

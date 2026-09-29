@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة التداول الذكية</title>
-    <!-- مكتبة الربط السحابي الفوري -->
-    <script src="https://pusher.com"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
         .section-card { background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
@@ -78,11 +76,6 @@
     <a href="tg://resolve?domain=invest_support_bot" class="btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
 
 <script>
-    // إعداد قنوات الاتصال اللاسلكية بين الشاشتين
-    const PUSHER_APP_KEY = '84e493405781604a11b6'; // مفتاح ربط مجاني فوري
-    const pusher = new Pusher(PUSHER_APP_KEY, { cluster: 'eu' });
-    const channel = pusher.subscribe('platform-channel');
-
     if(!localStorage.getItem('local_capital')) localStorage.setItem('local_capital', '0');
     if(!localStorage.getItem('local_todayProfit')) localStorage.setItem('local_todayProfit', '0');
     if(!localStorage.getItem('local_inviteProfit')) localStorage.setItem('local_inviteProfit', '0');
@@ -96,6 +89,7 @@
         document.getElementById('usernameForm').style.display = 'none';
         alert('🎯 تم التثبيت وقفل الحساب بنجاح!');
         updateLiveBalances();
+        startCheckingStatus();
     }
 
     function loadSavedUsername() {
@@ -103,6 +97,7 @@
         if(savedName) {
             document.getElementById('currentUsernameText').innerText = savedName;
             document.getElementById('usernameForm').style.display = 'none';
+            startCheckingStatus();
         }
     }
 
@@ -113,16 +108,17 @@
         document.getElementById('displayTeamCount').innerText = parseInt(localStorage.getItem('local_teamCount'));
     }
 
-    // إرسال الطلب لاسلكياً لشاشة المشرف
-    function sendOrderToAdmin(orderData) {
-        // إرسال الطلب عبر خادم نقل فوري وسريع
-        fetch('https://allorigins.win' + encodeURIComponent(`https://pusher.com{JSON.stringify(orderData)}`))
-        .then(() => alert('🎯 تم توجيه طلبك بنجاح إلى شاشة المشرف!'))
-        .catch(() => alert('🎯 تم توجيه طلبك بنجاح إلى شاشة المشرف!'));
-        
-        // إشعار شاشة المشرف محلياً للسرعة
-        const event = new CustomEvent('newOrderEvent', { detail: orderData });
-        window.parent.dispatchEvent(event);
+    function sendOrderToServer(orderData) {
+        fetch('http://localhost:3000/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) alert('🎯 تم إرسال الطلب بنجاح إلى السيرفر واجهة المشرف!');
+        })
+        .catch(err => alert('⚠️ فشل الاتصال بالسيرفر. تأكد من تشغيله!'));
     }
 
     function handleTransaction(type, amountId, walletId) {
@@ -132,16 +128,8 @@
 
         if(!currentUser) { alert('الرجاء إدخال اسمك أولاً!'); return; }
         if(!amount || !wallet) { alert('يرجى ملء الحقول أولاً.'); return; }
-        if(type === 'إيداع' && amount < 100) { alert('⚠️ الحد الأدنى للإيداع هو 100 USD!'); return; }
 
-        sendOrderToAdmin({
-            id: Date.now().toString(),
-            username: currentUser,
-            type: type,
-            amount: amount,
-            wallet: wallet
-        });
-
+        sendOrderToServer({ username: currentUser, type: type, amount: amount, wallet: wallet });
         if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
     }
 
@@ -152,22 +140,33 @@
         if(!currentUser) { alert('الرجاء إدخال اسمك أولاً!'); return; }
         if(!friendName) { alert('يرجى إدخال اسم الصديق!'); return; }
 
-        sendOrderToAdmin({
-            id: Date.now().toString(),
-            username: currentUser,
-            type: 'مكافأة دعوة',
-            friendName: friendName
-        });
-        
+        sendOrderToServer({ username: currentUser, type: 'مكافأة دعوة', friendName: friendName });
         document.getElementById('inviteMemberName').value = '';
     }
 
-    // استقبال قرارات المشرف فوراً لتحديث الأرصدة
-    channel.bind('admin-action', function(data) {
+    function startCheckingStatus() {
         const currentUser = localStorage.getItem('saved_user_name');
-        if (data.username === currentUser && data.action === 'accept') {
-            if (data.type === 'إيداع') {
-                localStorage.setItem('local_capital', parseFloat(localStorage.getItem('local_capital')) + data.amount);
-                localStorage.setItem('local_todayProfit', parseFloat(localStorage.getItem('local_todayProfit')) + (data.amount * 0.10));
-            } else if (data.type === 'سحب') {
-    
+        if(!currentUser) return;
+
+        setInterval(() => {
+            fetch(`http://localhost:3000/api/users/${currentUser}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data) {
+                    localStorage.setItem('local_capital', data.capital || 0);
+                    localStorage.setItem('local_todayProfit', data.todayProfit || 0);
+                    localStorage.setItem('local_inviteProfit', data.inviteProfit || 0);
+                    localStorage.setItem('local_teamCount', data.teamCount || 0);
+                    updateLiveBalances();
+                }
+            }).catch(err => console.log('جاري المزامنة مع السيرفر...'));
+        }, 3000);
+    }
+
+    window.onload = function() {
+        loadSavedUsername();
+        updateLiveBalances();
+    };
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@
         .btn-red { background-color: #d32f2f; color: white; }
         .btn-orange { background-color: #f57c00; color: white; }
         .btn-blue { background-color: #1976d2; color: white; padding: 10px; }
-        .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; padding: 12px; margin-top: 10px; }
         input { width: 100%; padding: 12px; background: #0b111e; border: 1px solid #1e2d4a; border-radius: 4px; color: #fff; box-sizing: border-box; margin-bottom: 5px; text-align: right; }
         .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; font-size: 13px; word-break: break-all; }
         .min-alert { font-size: 12px; color: #ff5252; margin-top: 5px; font-weight: bold; }
@@ -40,7 +40,7 @@
         <div style="font-size: 13px; color: #90a4ae; margin-top: 5px;">أعضاء فريقك النَشطين: <span id="displayTeamCount" style="color:#00e676; font-weight:bold;">0</span> / 40</div>
     </div>
 
-    <!-- 🔗 3. طلب مكافأة دعوة (يرسل للمشرف) -->
+    <!-- 🔗 3. طلب مكافأة دعوة -->
     <div class="section-card">
         <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
         <input type="text" id="inviteMemberName" placeholder="اسم الصديق المدعو">
@@ -56,8 +56,13 @@
         <div class="section-title">📊 أرباح اليوم:</div>
         <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
     </div>
+    <!-- 🎁 تم إرجاع الخانة المفقودة بنجاح هنا -->
+    <div class="section-card">
+        <div class="section-title">🎁 أرباح تذاكر ومكافآت الدعوة:</div>
+        <div class="value-display" id="displayInviteProfit" style="color: #ba68c8;">USDT 0.00</div>
+    </div>
 
-    <!-- 🚨 5. لوحة السحب (ترسل للمشرف) -->
+    <!-- 🚨 5. لوحة السحب -->
     <div class="section-card" style="border-color: #d32f2f;">
         <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية (شبكة TRC-20):</div>
         <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
@@ -65,7 +70,7 @@
         <button class="btn-action btn-red" onclick="handleTransaction('سحب', 'withdrawAmount', 'withdrawWallet')">💸 إرسال طلب السحب للمشرف</button>
     </div>
 
-    <!-- 📥 6. طلب إيداع رأس المال (يرسل للمشرف) -->
+    <!-- 📥 6. طلب إيداع رأس المال -->
     <div class="section-card" style="border-color: #f57c00;">
         <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
         <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
@@ -75,12 +80,13 @@
         <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
     </div>
 
-    <!-- 📞 7. زر الدعم الفني فقط يتوجه إلى تليجرام لحسابك الشخصي لحل المشكلات يدوياً -->
-    <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
+    <!-- 📞 7. الدعم الفني -->
+    <a href="tg://resolve?domain=invest_support_bot" class="btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
 
 <script>
     if(!localStorage.getItem('local_capital')) localStorage.setItem('local_capital', '0');
     if(!localStorage.getItem('local_todayProfit')) localStorage.setItem('local_todayProfit', '0');
+    if(!localStorage.getItem('local_inviteProfit')) localStorage.setItem('local_inviteProfit', '0');
     if(!localStorage.getItem('local_teamCount')) localStorage.setItem('local_teamCount', '0');
 
     function saveUsername() {
@@ -106,10 +112,10 @@
     function updateLiveBalances() {
         document.getElementById('displayCapital').innerText = `USDT ${parseFloat(localStorage.getItem('local_capital')).toFixed(2)}`;
         document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(localStorage.getItem('local_todayProfit')).toFixed(2)}`;
+        document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(localStorage.getItem('local_inviteProfit')).toFixed(2)}`;
         document.getElementById('displayTeamCount').innerText = parseInt(localStorage.getItem('local_teamCount'));
     }
 
-    // إرسال الطلبات للسيرفر الخاص بـ لوحة تحكم المشرف مباشرة
     function sendOrderToServer(orderData) {
         fetch('/api/orders', {
             method: 'POST',
@@ -119,13 +125,10 @@
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                alert('🎯 تم توجيه طلبك بنجاح إلى شاشة المشرف لطلب المعالجة والموافقة!');
+                alert('🎯 تم توجيه طلبك بنجاح إلى شاشة المشرف!');
             }
         })
-        .catch(err => {
-            console.error('خطأ:', err);
-            alert('⚠️ لم يتم استقبال الطلب. تأكد من أن سيرفر لوحة التحكم قيد التشغيل!');
-        });
+        .catch(err => alert('⚠️ فشل الاتصال بالسيرفر.'));
     }
 
     function handleTransaction(type, amountId, walletId) {
@@ -133,7 +136,7 @@
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
         const currentUser = localStorage.getItem('saved_user_name');
 
-        if(!currentUser) { alert('الرجاء إدخال اسمك أولاً في الأعلى لقفل الحساب!'); return; }
+        if(!currentUser) { alert('الرجاء إدخال اسمك أولاً!'); return; }
         if(!amount || !wallet) { alert('يرجى ملء الحقول أولاً.'); return; }
         if(type === 'إيداع' && amount < 100) { alert('⚠️ الحد الأدنى للإيداع هو 100 USD!'); return; }
 
@@ -152,7 +155,7 @@
         const friendName = document.getElementById('inviteMemberName').value.trim();
         const currentUser = localStorage.getItem('saved_user_name');
 
-        if(!currentUser) { alert('الرجاء إدخال اسمك وتثبيته أولاً!'); return; }
+        if(!currentUser) { alert('الرجاء إدخال اسمك أولاً!'); return; }
         if(!friendName) { alert('يرجى إدخال اسم الصديق!'); return; }
 
         sendOrderToServer({
@@ -165,7 +168,6 @@
         document.getElementById('inviteMemberName').value = '';
     }
 
-    // الاستماع الدوري لتحديثات المشرف لتلقي الموافقة والرفض تلقائياً دون تجميد الموقع
     function startCheckingStatus() {
         const currentUser = localStorage.getItem('saved_user_name');
         if(!currentUser) return;
@@ -177,18 +179,13 @@
                 if(data) {
                     localStorage.setItem('local_capital', data.capital || 0);
                     localStorage.setItem('local_todayProfit', data.todayProfit || 0);
+                    localStorage.setItem('local_inviteProfit', data.inviteProfit || 0);
                     localStorage.setItem('local_teamCount', data.teamCount || 0);
                     updateLiveBalances();
                 }
             })
-            .catch(err => console.log('بانتظار إجراء المشرف...'));
-        }, 4000);
+            .catch(err => console.log('مزامنة...'));
+        }, 3000);
     }
 
-    window.onload = function() {
-        loadSavedUsername();
-        updateLiveBalances();
-    };
-</script>
-</body>
-</html>
+    

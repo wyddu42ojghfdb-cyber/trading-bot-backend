@@ -8,12 +8,14 @@ app.use(express.json());
 let orders = [];
 let usersData = {};
 
-// دالة لتسجيل المستخدمين وتفعيل أعدادهم بمجرد قفل الاسم في الواجهة
+app.get('/', (req, res) => {
+    res.send('🚀 Sunucu Aktif ve Sorunsuz Çalışıyor!');
+});
+
 app.post('/api/register-user', (req, res) => {
     const { username } = req.body;
     if (username && !usersData[username]) {
         usersData[username] = { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 };
-        console.log(`👤 عضو جديد قفل حسابه الآن: ${username}`);
     }
     res.json({ success: true });
 });
@@ -43,7 +45,7 @@ app.post('/api/admin/distribute-profits', (req, res) => {
             count++;
         }
     }
-    res.json({ success: true, message: `تم توزيع ربح الـ 15% بنجاح على ${count} حساب مشحون!` });
+    res.json({ success: true, message: `Başarıyla ${count} hesaba %15 kâr dağıtıldı!` });
 });
 
 app.post('/api/admin/action', (req, res) => {
@@ -59,14 +61,14 @@ app.post('/api/admin/action', (req, res) => {
             usersData[order.username] = { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 };
         }
 
-        if (order.type === 'Toplam Sermaye Çekme') {
+        if (order.type === 'Yatırma') {
+            usersData[order.username].capital += parseFloat(order.amount || 0);
+        } else if (order.type === 'Toplam Sermaye Çekme') {
             usersData[order.username].capital = Math.max(0, usersData[order.username].capital - parseFloat(order.amount || 0));
         } else if (order.type === 'Bugünkü Kâr Çekme') {
             usersData[order.username].todayProfit = Math.max(0, usersData[order.username].todayProfit - parseFloat(order.amount || 0));
         } else if (order.type === 'Davetiye Ödülü Çekme') {
             usersData[order.username].inviteProfit = Math.max(0, usersData[order.username].inviteProfit - parseFloat(order.amount || 0));
-        } else if (order.type === 'Yatırma') {
-            usersData[order.username].capital += parseFloat(order.amount || 0);
         } else if (order.type === 'Referans Bonusu') {
             usersData[order.username].teamCount += 1;
             usersData[order.username].inviteProfit += 15;
@@ -83,4 +85,4 @@ app.get('/api/users/:username', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`السيرفر يعمل بكفاءة على المنفذ ${PORT}`));
+app.listen(PORT, () => console.log(`Sunucu ${PORT} portunda çalışıyor...`));

@@ -3,146 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التداول الذكية</title>
+    <title>لوحة تحكم المشرف</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
-        .section-card { background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .section-title { font-size: 14px; color: #90a4ae; margin-bottom: 10px; }
-        .value-display { font-size: 20px; font-weight: bold; color: #2196f3; text-align: left; }
-        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-purple { background-color: #7b1fa2; color: white; }
-        .btn-red { background-color: #d32f2f; color: white; }
-        .btn-orange { background-color: #f57c00; color: white; }
-        .btn-blue { background-color: #1976d2; color: white; padding: 10px; }
-        .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-        input { width: 100%; padding: 12px; background: #0b111e; border: 1px solid #1e2d4a; border-radius: 4px; color: #fff; box-sizing: border-box; margin-bottom: 5px; text-align: right; }
-        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; }
+        :root { --primary-color: #00c853; --danger-color: #b71c1c; --bg-color: #121212; --card-bg: #1e1e1e; --gold-color: #ffd600;}
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; padding: 20px; display: flex; justify-content: center; }
+        .admin-container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 30px; border-radius: 16px; }
+        .status-badge { display: inline-block; background: #1b5e20; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; }
+        .btn-broadcast { width: 100%; padding: 15px; background-color: var(--gold-color); color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        .request-card { background: #2a2a2a; border-left: 4px solid var(--primary-color); padding: 18px; border-radius: 8px; margin-bottom: 15px; }
+        .wallet-container { background: #111; padding: 10px; border-radius: 6px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-status { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-approve { background-color: #2e7d32; color: white; }
+        .btn-reject { background-color: #c62828; color: white; }
+        .btn-clear { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="section-card">
-        <div class="section-title">👤 اسم المستخدم الحالي:</div>
-        <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">لاعب حقيقي</div>
-        <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا للتغيير...">
-        <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت اسم العضو</button>
+<div class="admin-container">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2>لوحة تتبع المعاملات السحابية الحية</h2>
+        <!-- 📈 إظهار إجمالي عدد الطلبات حياً -->
+        <div id="orderCount" style="font-size: 14px; color: #4fc3f7; margin-bottom: 10px;">إجمالي طلبات المنصة: 0</div>
+        <div class="status-badge">🟢 متصل بشبكة جوجل الدائمة (Firebase)</div>
     </div>
 
-    <div class="section-card">
-        <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
-        <div class="value-display">2500 دولار أمريكي</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
-        <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
-        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 أرسل الطلب إلى مشرفك</button>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">💰 إجمالي رأس المال:</div>
-        <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">📊 أرباح اليوم:</div>
-        <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">👥 أرباح تذاكر الدعوة:</div>
-        <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card" style="border-color: #d32f2f;">
-        <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية والآمنة:</div>
-        <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
-        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية TRC-20">
-        <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
-        <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
-    </div>
-
-    <div class="section-card" style="border-color: #f57c00;">
-        <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال:</div>
-        <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
-        <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل">
-        <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
-    </div>
-
-    <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
+    <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
+    <div id="requestsContainer"></div>
+    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف السجلات</button>
+</div>
 
 <script>
-    // 🌐 الاتصال المباشر بقاعدة بيانات جوجل السحابية الثابتة
-    const dbUrl = 'https://firebaseio.com';
+    const dbUrl = 'https://trading-bot-6f5df-default-rtdb.firebaseio.com';
 
-    function saveUsername() {
-        const name = document.getElementById('usernameInput').value.trim();
-        if(!name) return;
-        localStorage.setItem('saved_user_name', name);
-        document.getElementById('currentUsernameText').innerText = name;
-        alert('تم تثبيت اسم العضو سحابياً!');
-    }
-
-    function updateLiveBalances() {
-        fetch(`${dbUrl}/balances.json`)
+    function loadAdminRequests() {
+        fetch(`${dbUrl}/orders.json`)
         .then(res => res.json())
-        .then(balance => {
-            if(balance) {
-                document.getElementById('displayCapital').innerText = `USDT ${parseFloat(balance.capital || 0).toFixed(2)}`;
-                document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(balance.todayProfit || 0).toFixed(2)}`;
-                document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(balance.inviteProfit || 0).toFixed(2)}`;
+        .then(data => {
+            const container = document.getElementById('requestsContainer');
+            container.innerHTML = '';
+            
+            if(!data) { 
+                document.getElementById('orderCount').innerText = "إجمالي طلبات المنصة: 0";
+                container.innerHTML = '<p style="text-align:center; color:#aaa;">شاشات المراقبة نظيفة، لا توجد طلبات</p>'; 
+                return; 
             }
-        }).catch(err => console.log("جاري الاتصال السحابي..."));
-    }
 
-    function handleTransaction(actionType, amountId, walletId) {
-        const amount = document.getElementById(amountId).value;
-        const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
+            const keys = Object.keys(data);
+            document.getElementById('orderCount').innerText = `إجمالي طلبات المنصة: ${keys.length}`;
 
-        if(!amount || !wallet) return alert('يرجى ملء كافة البيانات المطلوب');
-
-        const newRequest = {
-            amount: parseFloat(amount) || 0,
-            wallet: `${wallet} (اسم العضو: ${currentUser})`,
-            type: actionType,
-            status: 'معلق',
-            date: new Date().toLocaleString('ar-EG')
-        };
-
-        fetch(`${dbUrl}/orders.json`, {
-            method: 'POST',
-            body: JSON.stringify(newRequest)
-        })
-        .then(() => {
-            alert(`🎯 تم بنجاح إرسال طلب ${actionType} للمشرف عبر شبكة جوجل الدائمة!`);
-            if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
+            keys.reverse().forEach(key => {
+                const req = data[key];
+                const typeColor = req.type.includes('سحب') ? '#ff5252' : '#00e676';
+                
+                const cardHtml = `
+                    <div class="request-card" style="border-left-color: ${typeColor}">
+                        <p><strong>اسم العضو المرسل:</strong> <span style="color: #4fc3f7; font-weight: bold;">${req.username || 'لاعب حقيقي'}</span></p>
+                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}">${req.type}</span></p>
+                        <p><strong>المبلغ:</strong> ${req.amount} USDT</p>
+                        <div class="wallet-container">
+                            <span style="font-size:13px; color:#ffb74d; word-break:break-all;">${req.wallet}</span>
+                            <button style="padding:4px 8px; background:#444; color:#fff; border:none; cursor:pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ')">نسخ</button>
+                        </div>
+                        <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
+                            <button class="btn-status btn-approve" onclick="updateStatus('${key}', 'تم القبول', '${req.type}', ${req.amount})">موافق 👍</button>
+                            <button class="btn-status btn-reject" onclick="updateStatus('${key}', 'تم الرفض')">رفض 👎</button>
+                        </div>
+                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة: <strong>${req.status}</strong> | التوقيت: ${req.date}</p>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
         });
     }
 
-    function sendInviteRequest() {
-        const memberName = document.getElementById('inviteMemberName').value.trim();
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
-        if(!memberName) return alert('اكتب اسم العضو أولاً');
+    function updateStatus(key, newStatus, type, amount) {
+        fetch(`${dbUrl}/orders/${key}.json`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(() => {
+            if (newStatus === 'تم القبول') {
+                fetch(`${dbUrl}/balances.json`)
+                .then(res => res.json())
+                .then(balance => {
+                    let current = balance || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+                    const numAmount = parseFloat(amount) || 0;
 
-        const newRequest = {
-            amount: 0,
-            wallet: `العضو: ${memberName} (بواسطة: ${currentUser})`,
-            type: 'مكافأة دعوة',
-            status: 'معلق',
-            date: new Date().toLocaleString('ar-EG')
-        };
+                    if (type === 'إيداع') current.capital += numAmount;
+                    else if (type === 'سحب كلّي') current.capital = 0;
+                    else if (type === 'سحب اليوم') current.todayProfit -= numAmount;
 
-        fetch(`${dbUrl}/orders.json`, { method: 'POST', body: JSON.stringify(newRequest) })
-        .then(() => { alert('تم تقديم طلب المكافأة للمشرف!'); document.getElementById('inviteMemberName').value = ''; });
+                    fetch(`${dbUrl}/balances.json`, { method: 'PUT', body: JSON.stringify(current) });
+                });
+            }
+            setTimeout(loadAdminRequests, 500);
+        });
     }
 
-    setInterval(updateLiveBalances, 1500);
-    window.onload = function() {
-        const savedName = localStorage.getItem('saved_user_name');
-        if(savedName) document.getElementById('currentUsernameText').innerText = savedName;
-        updateLiveBalances();
-    };
+    function broadcastTodayProfit() {
+        fetch(`${dbUrl}/balances.json`)
+        .then(res => res.json())
+        .then(balance => {
+            let current = balance || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+            if (current.capital <= 0) return alert('رأس مال المشتركين صفر!');
+            
+            const profit = current.capital * 0.15;
+            current.todayProfit += profit;
+
+            fetch(`${dbUrl}/balances.json`, { method: 'PUT', body: JSON.stringify(current) })
+            .then(() => alert(`تم بث أرباح الصفقة اليومية 15% بمجموع مضاف: ${profit.toFixed(2)} USDT`));
+        });
+    }
+
+    function clearAllRequests() {
+        if(confirm('تأكيد مسح السجلات؟')) fetch(`${dbUrl}/orders.json`, { method: 'DELETE' }).then(() => loadAdminRequests());
+    }
+
+    setInterval(loadAdminRequests, 2000);
+    window.onload = loadAdminRequests;
 </script>
 </body>
 </html>

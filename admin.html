@@ -3,220 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف - نظام المزامنة الحية</title>
+    <title>لوحة تحكم المشرف - إدارة الطلبات</title>
     <style>
-        :root { 
-            --primary-color: #00c853; 
-            --danger-color: #b71c1c; 
-            --bg-color: #121212; 
-            --card-bg: #1e1e1e; 
-            --gold-color: #ffd600;
-        }
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background-color: var(--bg-color); 
-            color: #fff; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-        }
-        .admin-container { 
-            width: 100%; 
-            max-width: 600px; 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-        }
-        .status-badge { 
-            display: inline-block; 
-            background: #1b5e20; 
-            color: #fff; 
-            padding: 4px 12px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            margin-bottom: 15px; 
-            font-weight: bold;
-        }
-        .btn-broadcast { 
-            width: 100%; 
-            padding: 15px; 
-            background-color: var(--gold-color); 
-            color: #000; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-bottom: 20px; 
-            box-shadow: 0 4px 15px rgba(255,214,0,0.2);
-        }
-        .btn-broadcast:hover { background-color: #ffea00; }
-        .request-card { 
-            background: #2a2a2a; 
-            border-left: 4px solid var(--primary-color); 
-            padding: 18px; 
-            border-radius: 8px; 
-            margin-bottom: 15px; 
-            text-align: right;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .request-card.withdraw-type {
-            border-left-color: var(--danger-color);
-        }
-        .request-card.invite-type {
-            border-left-color: #7b1fa2;
-        }
-        .request-card p { 
-            margin: 8px 0; 
-            font-size: 15px; 
-        }
-        .wallet-container { 
-            background: #111; 
-            padding: 10px; 
-            border-radius: 6px; 
-            margin: 12px 0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border: 1px solid #3a3a3a;
-        }
-        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-status { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-approve { background-color: #2e7d32; color: white; }
-        .btn-approve:hover { background-color: #1b5e20; }
-        .btn-reject { background-color: #c62828; color: white; }
-        .btn-reject:hover { background-color: #b71c1c; }
-        .btn-clear { 
-            width: 100%; 
-            padding: 12px; 
-            background: transparent; 
-            border: 1px solid var(--danger-color); 
-            color: var(--danger-color); 
-            border-radius: 8px; 
-            cursor: pointer; 
-            margin-top: 20px; 
-            font-weight: bold;
-        }
-        .btn-clear:hover { background: var(--danger-color); color: #fff; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 20px; direction: rtl; }
+        .admin-container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #2196f3; font-size: 24px; border-bottom: 2px solid #1e2d4a; padding-bottom: 10px; }
+        .order-table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #1e2d4a; }
+        th { background-color: #1e2d4a; color: #90a4ae; font-size: 14px; }
+        td { font-size: 15px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 5px; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-success { background-color: #00e676; color: #000; }
+        .btn-danger { background-color: #ff5252; color: #fff; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-deposit { background-color: #f57c00; color: white; }
+        .badge-withdraw { background-color: #d32f2f; color: white; }
+        .badge-invite { background-color: #7b1fa2; color: white; }
+        .no-orders { text-align: center; color: #90a4ae; padding: 30px; font-style: italic; }
     </style>
 </head>
 <body>
 
-<div class="admin-container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h2>لوحة تتبع المعاملات الحية المتوافقة</h2>
-        <div id="orderCount" style="font-size: 14px; color: #4fc3f7; margin-bottom: 10px; font-weight: bold;">إجمالي طلبات المنصة: 0</div>
-        <div class="status-badge" id="liveStatusBadge">🟢 متصل ومزامن حياً مع المشتركين</div>
-    </div>
+    <div class="admin-container">
+        <h1>🖥️ لوحة تحكم المشرف الفورية</h1>
+        <p style="color: #90a4ae;">تظهر هنا طلبات الإيداع، السحب، ومكافآت الدعوة تلقائياً للتحكم بها:</p>
 
-    <!-- 📊 زر بث الأرباح 15% حياً للمشتركين -->
-    <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
-    
-    <div id="requestsContainer">
-        <p style="text-align:center; color:#aaa; font-style:italic;">جاري تحميل البيانات الحية السحابية...</p>
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>اسم المستخدم</th>
+                    <th>نوع الطلب</th>
+                    <th>المبلغ / التفاصيل</th>
+                    <th>عنوان المحفظة / الصديق</th>
+                    <th>الإجراءات والقرارات</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+                <!-- يتم تحميل الطلبات هنا تلقائياً بواسطة الجافاسكربت -->
+            </tbody>
+        </table>
     </div>
-    
-    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة وتصفير السجلات</button>
-</div>
 
 <script>
-    // 🌐 القناة السحابية الموحدة المشتركة مع واجهة المستخدم
-    const channelUrl = 'https://jsonbin.io';
-    const apiKey = '$2a$10$7R4b6/nJv/GskcZ.vNlO2uTskK0Jq6b19H7H9YhM8rR4n3CExZ6vS';
-
-    function checkAdminAuth() {
-        if (sessionStorage.getItem('is_admin_auth') === 'true') {
-            loadAdminRequests();
-            setInterval(loadAdminRequests, 2500);
-            return;
-        }
-        const user = prompt("اسم المستخدم للمشرف:");
-        const pass = prompt("كلمة المرور السرية للمشرف:");
-        if (user === "admin" && pass === "admin123") {
-            sessionStorage.setItem('is_admin_auth', 'true');
-            loadAdminRequests();
-            setInterval(loadAdminRequests, 2500);
-        } else {
-            alert("❌ بيانات الدخول خاطئة!");
-            window.location.href = "index.html";
-        }
-    }
-
-    function loadAdminRequests() {
-        fetch(channelUrl, { headers: { 'X-Master-Key': apiKey }, cache: "no-cache" })
+    // دالة لجلب الطلبات المعلقة من السيرفر وعرضها فوراً
+    function fetchLiveOrders() {
+        fetch('/api/admin/orders')
         .then(res => res.json())
-        .then(resData => {
-            const serverData = resData.record || { orders: [], balances: { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 } };
-            const orders = serverData.orders || [];
-            
-            document.getElementById('orderCount').innerText = `إجمالي طلبات المنصة: ${orders.length}`;
-            const container = document.getElementById('requestsContainer');
-            container.innerHTML = '';
-
-            if(orders.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#aaa; font-style:italic;">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</p>';
+        .then(orders => {
+            const tbody = document.getElementById('ordersTableBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="no-orders">☕ لا توجد طلبات جديدة معلقة حالياً... الجدول نظيف!</td></tr>`;
                 return;
             }
 
-            [...orders].reverse().forEach((req, index) => {
-                const actualIndex = orders.length - 1 - index;
-                
-                let cardClass = 'request-card';
-                if(req.type && req.type.includes('سحب')) cardClass = 'request-card withdraw-type';
-                if(req.type && req.type.includes('مكافأة')) cardClass = 'request-card invite-type';
-                
-                let typeColor = '#00c853';
-                if(cardClass.includes('withdraw-type')) typeColor = '#ff5252';
-                if(cardClass.includes('invite-type')) typeColor = '#7b1fa2';
-                
-                let statusIcon = '⏳';
-                let statusColor = '#fff';
-                if (req.status === 'تم القبول') { statusIcon = '✅'; statusColor = '#00e676'; }
-                if (req.status === 'تم الرفض') { statusIcon = '❌'; statusColor = '#ff5252'; }
+            tbody.innerHTML = ''; // تفريغ الجدول لإعادة البناء
+            orders.forEach(order => {
+                let badgeClass = 'badge-deposit';
+                if(order.type === 'سحب') badgeClass = 'badge-withdraw';
+                if(order.type === 'مكافأة دعوة') badgeClass = 'badge-invite';
 
-                const cardHtml = `
-                    <div class="${cardClass}">
-                        <p><strong>صاحب الطلب (الداعي):</strong> <span style="color: #4fc3f7; font-weight: bold;">${req.username || 'غير مسجل'}</span></p>
-                        <p><strong>نوع الإجراء المطلوب:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
-                        <p><strong>المبلغ المالي:</strong> <span style="font-size: 16px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
-                        
-                        <!-- 📋 حقل المحفظة أو أسماء الدعوة مع زر نسخ فوري -->
-                        <div class="wallet-container">
-                            <span style="font-size:13px; color:#ffb74d; font-family:monospace; word-break:break-all;">${req.wallet}</span>
-                            <button style="padding:5px 10px; background:#0088cc; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:4px;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ البيانات المحددة بنجاح!')">📋 نسخ</button>
-                        </div>
+                const details = order.amount ? `${order.amount} USDT` : 'طلب إضافة عضو';
+                const extraInfo = order.wallet ? order.wallet : `الصديق: ${order.friendName}`;
 
-                        <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
-                            <button class="btn-status btn-approve" onclick="updateStatus(${actualIndex}, 'تم القبول', '${req.type}', ${req.amount}, serverData)">موافق 👍</button>
-                            <button class="btn-status btn-reject" onclick="updateStatus(${actualIndex}, 'تم الرفض', '${req.type}', ${req.amount}, serverData)">رفض 👎</button>
-                        </div>
-                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة الحالية: <strong style="color:${statusColor}">${statusIcon} ${req.status}</strong> | التوقيت: ${req.date}</p>
-                    </div>
+                const row = `
+                    <tr>
+                        <td style="font-weight: bold; color: #4fc3f7;">${order.username}</td>
+                        <td><span class="badge ${badgeClass}">${order.type}</span></td>
+                        <td style="color: #00e676; font-weight: bold;">${details}</td>
+                        <td style="font-family: monospace; color: #ffb74d;">${extraInfo}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="takeAction('${order.id}', 'accept')">✅ قبول</button>
+                            <button class="btn btn-danger" onclick="takeAction('${order.id}', 'reject')">❌ رفض</button>
+                        </td>
+                    </tr>
                 `;
-                container.innerHTML += cardHtml;
+                tbody.innerHTML += row;
             });
-        }).catch(err => {
-            document.getElementById('liveStatusBadge').innerText = '🔴 خطأ مزامنة مؤقت';
-            document.getElementById('liveStatusBadge').style.backgroundColor = '#b71c1c';
-        });
+        })
+        .catch(err => console.log('في انتظار اتصال السيرفر...'));
     }
 
-    function updateStatus(index, newStatus, type, amount, serverData) {
-        serverData.orders[index].status = newStatus;
+    // إرسال قرار المشرف (قبول/رفض) إلى السيرفر ليتم تحديث رصيد المستخدم فوراً
+    function takeAction(orderId, action) {
+        fetch('/api/admin/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, action })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert(action === 'accept' ? '🎯 تم قبول الطلب وتحديث رصيد الحساب!' : '❌ تم رفض الطلب وإلغاؤه.');
+                fetchLiveOrders(); // تحديث الجدول فوراً
+            }
+        })
+        .catch(err => alert('حدث خطأ أثناء تنفيذ الإجراء.'));
+    }
 
-        if (newStatus === 'تم القبول') {
-            let bal = serverData.balances || { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 };
-            const num = parseFloat(amount) || 0;
-
-            // تنفيذ الحسابات والعدادات حياً بناءً على نوع موافقة الأدمن
-            if (type === 'إيداع رأس مال') {
-                bal.capital += num;
-            } else if (type === 'سحب رأس المال الكلّي') {
-                bal.capital = Math.max(0, bal.capital - num);
-            } else if (type === 'سحب أرباح اليوم') {
-                bal.todayProfit = Math.max(0, bal.todayProfit - num);
-            } else if (type === 'سحب أرباح الدعوة') {
-                bal.inviteProfit = Math.max(0, bal.inviteProfit - num);
-            } else if (type === 'طلب مكافأة دعوة صديق') {
-                
+    // تشغيل الفحص الدوري كل ثانيتين للتحديث الفوري والحيوي
+    setInterval(fetchLiveOrders, 2000);
+    window.onload = fetchLiveOrders;
+</script>
+</body>
+</html>

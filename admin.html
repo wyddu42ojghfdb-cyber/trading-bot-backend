@@ -1,53 +1,206 @@
-function loadAdminRequests() {
-    // جلب البيانات من المخزن الثابت والمباشر للواجهة دون الحاجة للسيرفر المعطل
-    const requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
-    const container = document.getElementById('requestsContainer');
-    
-    // تغيير الشارة للون الأخضر لأن الاتصال أصبح محلياً وثابتاً
-    const statusBadge = document.querySelector('.status-badge') || id="liveStatus";
-    if(statusBadge) {
-        statusBadge.innerText = '🟢 متصل بمستودع البيانات الثابتة';
-        statusBadge.style.backgroundColor = '#1b5e20';
-    }
-    
-    container.innerHTML = ''; 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المشرف - مراقبة المعاملات</title>
+    <style>
+        :root {
+            --primary-color: #00c853;
+            --danger-color: #b71c1c;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
 
-    if (requests.length === 0) {
-        container.innerHTML = '<div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>';
-        return;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-    // عرض الطلبات من الأحدث للأقدم
-    [...requests].reverse().forEach(req => {
-        const isWithdraw = req.type && req.type.includes('سحب');
-        const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
-        const typeColor = isWithdraw ? '#ff5252' : '#00e676';
+        .admin-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
 
-        const cardHtml = `
-            <div class="${cardClass}" style="background: #2a2a2a; border-left: 4px solid ${typeColor}; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
-                <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
-                <p><strong>عنوان محفظة العميل:</strong> 
-                    <span style="font-family: monospace; background: #111; padding: 4px; border-radius: 4px; font-size: 13px;">${req.wallet}</span>
-                    <button class="copy-btn" style="background: #444; color: #fff; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ المحفظة!')">نسخة</button>
-                </p>
-                <div class="request-meta" style="display: flex; justify-content: space-between; color: #aaa; font-size: 12px; margin-top: 10px;">
-                    <span>حالة الطلب: ⏳ معلق</span>
-                    <span>توقيت الإرسال: ${req.date || 'غير محدد'}</span>
+        .admin-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #3a3a3a;
+            padding-bottom: 15px;
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin: 0 0 5px 0;
+        }
+
+        .admin-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #1b5e20;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .requests-list {
+            margin-top: 20px;
+            min-height: 150px;
+        }
+
+        .request-card {
+            background: #2a2a2a;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .request-card.withdraw-type {
+            border-left-color: var(--danger-color);
+        }
+
+        .request-card p {
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        .request-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-clear:hover {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .copy-btn:hover { background: #555; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>لوحة تتبع المعاملات الحية</h1>
+        <p>شاشة مراقبة طلبات الإيداع والسحب الخاصة بالمشرف</p>
+        <div id="liveStatus" class="status-badge">🟢 متصل بمستودع البيانات الثابتة</div>
+    </div>
+
+    <!-- قائمة عرض الطلبات المستلمة -->
+    <div class="requests-list" id="requestsContainer">
+        <div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>
+    </div>
+
+    <!-- زر تنظيف اللوحة -->
+    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة ومسح السجلات</button>
+</div>
+
+<!-- ⚙️ تم إضافة وسم البداية الصحيح هنا -->
+<script>
+    function loadAdminRequests() {
+        // جلب البيانات من المخزن الثابت والمباشر للواجهة دون الحاجة للسيرفر المعطل
+        const requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        const container = document.getElementById('requestsContainer');
+        
+        container.innerHTML = ''; 
+
+        if (requests.length === 0) {
+            container.innerHTML = '<div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>';
+            return;
+        }
+
+        // عرض الطلبات من الأحدث للأقدم
+        [...requests].reverse().forEach(req => {
+            const isWithdraw = req.type && req.type.includes('سحب');
+            const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
+            const typeColor = isWithdraw ? '#ff5252' : '#00e676';
+
+            const cardHtml = `
+                <div class="${cardClass}">
+                    <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
+                    <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
+                    <p><strong>عنوان محفظة العميل:</strong> 
+                        <span style="font-family: monospace; background: #111; padding: 4px; border-radius: 4px; font-size: 13px;">${req.wallet}</span>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ المحفظة!')">نسخ</button>
+                    </p>
+                    <div class="request-meta">
+                        <span>حالة الطلب: ⏳ معلق</span>
+                        <span>توقيت الإرسال: ${req.date || 'غير محدد'}</span>
+                    </div>
                 </div>
-            </div>
-        `;
-        container.innerHTML += cardHtml;
-    });
-}
-
-function clearAllRequests() {
-    if (confirm('هل أنت متأكد من رغبتك في حذف وتصفير جميع الطلبات الحالية من لوحة التحكم؟')) {
-        localStorage.removeItem('admin_orders');
-        loadAdminRequests();
+            `;
+            container.innerHTML += cardHtml;
+        });
     }
-}
 
-// تحديث فوري مستمر كل ثانيتين
-setInterval(loadAdminRequests, 2000);
-window.onload = loadAdminRequests;
+    function clearAllRequests() {
+        if (confirm('هل أنت متأكد من رغبتك في حذف وتصفير جميع الطلبات الحالية من لوحة التحكم؟')) {
+            localStorage.removeItem('admin_orders');
+            loadAdminRequests();
+        }
+    }
+
+    // تحديث فوري مستمر كل ثانيتين
+    setInterval(loadAdminRequests, 2000);
+    window.onload = loadAdminRequests;
+</script> 
+<!-- ⚙️ تم إغلاق الوسم البرمجي بشكل صحيح هنا -->
+
+</body>
+</html>

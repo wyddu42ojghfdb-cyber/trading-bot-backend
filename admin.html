@@ -12,6 +12,7 @@
             --card-bg: #1e1e1e;
             --text-color: #ffffff;
             --text-muted: #aaaaaa;
+            --gold-color: #ffd600;
         }
 
         body {
@@ -61,6 +62,26 @@
             border-radius: 20px;
             font-size: 12px;
             margin-top: 10px;
+        }
+
+        /* 🚀 تصميم زر توزيع الأرباح الجديد */
+        .btn-broadcast {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--gold-color);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
+        }
+
+        .btn-broadcast:hover {
+            background-color: #ffea00;
         }
 
         .requests-list {
@@ -185,6 +206,9 @@
         <div id="liveStatus" class="status-badge">🟢 متصل بمستودع البيانات الثابتة</div>
     </div>
 
+    <!-- 🚀 الزر الجديد لبث الأرباح اليومية لجميع المشتركين -->
+    <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
+
     <div class="requests-list" id="requestsContainer">
         <div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>
     </div>
@@ -248,7 +272,7 @@
         });
         localStorage.setItem('admin_orders', JSON.stringify(requests));
 
-        // 🔄 تحديث الحساب المالي للمستخدم محلياً عند الضغط على موافق
+        // تحديث الحساب المالي للمستودع المحلي عند الموافقة
         if (newStatus === 'تم القبول') {
             let userBalance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
             const numAmount = parseFloat(amount) || 0;
@@ -268,15 +292,9 @@
         loadAdminRequests();
     }
 
-    function clearAllRequests() {
-        if (confirm('هل أنت متأكد من الحذف؟')) {
-            localStorage.removeItem('admin_orders');
-            loadAdminRequests();
-        }
-    }
-
-    setInterval(loadAdminRequests, 2000);
-    window.onload = loadAdminRequests;
-</script>
-</body>
-</html>
+    // 🚀 الدالة الجديدة الذكية لحساب وبث الأرباح بنسبة 15%
+    function broadcastTodayProfit() {
+        let userBalance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+        
+        if (userBalance.capital <= 0) {
+            

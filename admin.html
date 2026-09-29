@@ -27,7 +27,7 @@
     <div class="admin-container">
         <h1>🖥️ لوحة تحكم المشرف السحابية</h1>
         
-        <!-- 👥 عداد إجمالي عدد الأعضاء المسجلين حياً -->
+        <!-- 👥 عداد إجمالي عدد الأعضاء المسجلين حياً من السيرفر -->
         <div class="stats-bar">
             <div class="stat-card">
                 <div style="color: #90a4ae; font-size: 14px;">👥 إجمالي عدد الأعضاء المسجلين:</div>
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <!-- 💰 زر التحكم اليدوي لتوزيع الـ 15% بضغطة واحدة -->
+        <!-- 💰 زر التحكم اليدوي المضاف للمشرف لتوزيع الأرباح اليومية بنسبة 15% بنقرة واحدة -->
         <div class="profit-action-card">
             <h3 style="margin-top:0; color:#ffb74d;">⚙️ الإجراءات الجماعية اليومية:</h3>
             <p style="font-size:13px; color:#90a4ae;">الضغط على هذا الزر يضيف ربح 15% فوراً لجميع الحسابات التي تمتلك رأس مال مشحون فقط:</p>
@@ -50,7 +50,7 @@
                     <th>نوع الطلب</th>
                     <th>المبلغ / التفاصيل</th>
                     <th>المحفظة / تفاصيل الإرسال (مع إمكانية النسخ)</th>
-                    <th>القرار الرسمي</th>
+                    <th>القرار الرسمي للمشرف</th>
                 </tr>
             </thead>
             <tbody id="ordersTableBody"></tbody>
@@ -72,20 +72,21 @@
     </div>
 
 <script>
-    // ⚙️ تم ربط الواجهة مباشرة برابط سيرفر Render السحابي المستقر والجديد الخاص بكم
-    const CLOUD_SERVER_URL = "https://onrender.com";
+    // ⚙️ تم الربط المباشر برابط سيرفر Render السحابي المستقر والجديد الخاص بكم
+    const CLOUD_SERVER_URL = "https://trading-bot-backend-1-flfd.onrender.com";
 
     function refreshLiveAdminData() {
-        // 1. جلب طلبات السحب والإيداع المعلقة
+        // 1. جلب طلبات السحب والإيداع ومكافآت الدعوة المعلقة
         fetch(`${CLOUD_SERVER_URL}/api/admin/orders`)
         .then(res => res.json())
         .then(orders => {
             const tbody = document.getElementById('ordersTableBody');
-            tbody.innerHTML = orders.length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد طلبات معلقة حالياً...</td></tr>` : '';
+            tbody.innerHTML = orders.length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد طلبات معلقة حالياً... الجدول نظيف!</td></tr>` : '';
             orders.forEach(order => {
                 const infoAmount = order.amount ? `${order.amount} USDT` : 'طلب مكافأة';
                 const infoAddress = order.wallet ? order.wallet : `صديق: ${order.friendName}`;
-                // تفعيل زر النسخ الفوري للمحفظة المرسلة
+                
+                // زر نسخ المحفظة البرمجي التلقائي
                 const copyButtonHtml = order.wallet ? `<button class="btn btn-copy" onclick="navigator.clipboard.writeText('${order.wallet}'); alert('تم نسخ عنوان المحفظة!')">📋 نسخ</button>` : '';
 
                 tbody.innerHTML += `
@@ -104,12 +105,12 @@
             });
         });
 
-        // 2. جلب وتحديث الأرصدة وإجمالي أعداد المشتركين
+        // 2. جلب وتحديث الأرصدة وإجمالي أعداد المشتركين حياً
         fetch(`${CLOUD_SERVER_URL}/api/admin/users-profits`)
         .then(res => res.json())
         .then(users => {
             const tbody = document.getElementById('profitsTableBody');
-            tbody.innerHTML = Object.keys(users).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد بيانات مسجلة...</td></tr>` : '';
+            tbody.innerHTML = Object.keys(users).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد بيانات مسجلة للأعضاء حتى الآن...</td></tr>` : '';
             
             // تحديث عداد أعداد المستخدمين الإجمالي ديناميكياً
             const totalUsers = Object.keys(users).length;
@@ -122,7 +123,7 @@
                         <td style="color:#ffb74d;">USDT ${(users[username].capital || 0).toFixed(2)}</td>
                         <td style="color:#00e676; font-weight:bold;">USDT ${(users[username].todayProfit || 0).toFixed(2)}</td>
                         <td style="color:#ba68c8;">USDT ${(users[username].inviteProfit || 0).toFixed(2)}</td>
-                        <td>${users[username].teamCount || 0} أعضاء</td>
+                        <td>${users[username].teamCount || 0} أعضاء نشطين</td>
                     </tr>`;
             }
         });
@@ -137,7 +138,7 @@
                 alert(data.message);
                 refreshLiveAdminData();
             })
-            .catch(err => alert("فشل إرسال أمر التوزيع السحابي."));
+            .catch(err => alert("فشل إرسال أمر التوزيع السحابي لـ Render."));
         }
     }
 
@@ -152,7 +153,7 @@
         .then(data => { if(data.success) refreshLiveAdminData(); });
     }
 
-    // تحديث الشاشة تلقائياً كل ثانيتين لمتابعة الطلبات الجديدة
+    // تحديث الشاشة تلقائياً كل ثانيتين لمتابعة الطلبات الجديدة فوراُ دون تجميد
     setInterval(refreshLiveAdminData, 2000);
     window.onload = refreshLiveAdminData;
 </script>

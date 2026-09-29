@@ -5,45 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة التداول الذكية</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
         .section-card { background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .section-title { font-size: 14px; color: #90a4ae; margin-bottom: 10px; }
-        .value-display { font-size: 20px; font-weight: bold; color: #2196f3; text-align: left; }
-        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .value-display { font-size: 20px; font-weight: bold; color: #2196f3; text-align: left; margin: 5px 0; }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: opacity 0.2s; }
+        .btn-action:hover { opacity: 0.9; }
         .btn-purple { background-color: #7b1fa2; color: white; }
         .btn-red { background-color: #d32f2f; color: white; }
         .btn-orange { background-color: #f57c00; color: white; }
         .btn-blue { background-color: #1976d2; color: white; padding: 10px; }
         .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         input { width: 100%; padding: 12px; background: #0b111e; border: 1px solid #1e2d4a; border-radius: 4px; color: #fff; box-sizing: border-box; margin-bottom: 5px; text-align: right; }
-        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; }
+        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; margin-bottom: 10px; font-size: 13px; }
+        .min-alert { font-size: 12px; color: #ff5252; margin-top: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- 👤 قسم اسم العضو مع ميزة القفل التام بعد الحفظ -->
+    <!-- 👤 1. حقل الاسم المقفول تماماً بعد الحفظ -->
     <div class="section-card">
         <div class="section-title">👤 اسم المستخدم الحالي:</div>
-        <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">لاعب حقيقي</div>
+        <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">يرجى كتابة الاسم وتثبيته أولاً</div>
         <div id="usernameForm">
-            <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا للتثبيت...">
-            <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت اسم العضو</button>
+            <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا لقفل الحساب...">
+            <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت الاسم (غير قابل للتعديل)</button>
         </div>
     </div>
 
+    <!-- 🏆 2. أعضاء الفريق والشركة الكبرى -->
     <div class="section-card">
         <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
-        <div class="value-display">2500 دولار أمريكي</div>
+        <div class="value-display" style="color: #ffd600;">2500 دولار أمريكي</div>
+        <div style="font-size: 13px; color: #90a4ae; margin-top: 5px;">أعضاء فريقك النَشطين: <span id="displayTeamCount" style="color:#00e676; font-weight:bold;">0</span> / 40</div>
     </div>
 
+    <!-- 🔗 3. تقديم طلب مكافأة دعوة مع إظهار الداعي والمدعو -->
     <div class="section-card">
-        <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
-        <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
-        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 أرسل الطلب إلى مشرفك</button>
+        <div class="section-title">🔗 أرسل طلباً للحصول على مكافأة الدعوة الخاصة بك:</div>
+        <input type="text" id="inviteMemberName" placeholder="اسم الصديق المدعو">
+        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 تقديم طلب المكافأة للمشرف</button>
     </div>
 
+    <!-- 💰 4. شاشات الأرصدة التفاعلية الحية -->
     <div class="section-card">
-        <div class="section-title">💰 إجمالي رأس المال:</div>
+        <div class="section-title">💰 إجمالي رأس المال الكلي:</div>
         <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
     </div>
 
@@ -57,71 +63,84 @@
         <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
     </div>
 
+    <!-- 🚨 5. لوحة السحب المقسمة على 3 مراحل مع إدخال محفظة TRC20 لكل عملية -->
     <div class="section-card" style="border-color: #d32f2f;">
         <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية والآمنة:</div>
         <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
-        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية TRC-20">
-        <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
-        <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
+        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك لشبكة TRC-20">
+        
+        <button class="btn-action btn-red" onclick="handleTransaction('سحب رأس المال الكلّي', 'withdrawAmount', 'withdrawWallet')">💸 سحب رأس المال الكلي</button>
+        <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب أرباح اليوم', 'withdrawAmount', 'withdrawWallet')">📊 سحب أرباح اليوم</button>
+        <button class="btn-action btn-purple" onclick="handleTransaction('سحب أرباح الدعوة', 'withdrawAmount', 'withdrawWallet')">👥 سحب أرباح الدعوة</button>
     </div>
 
+    <!-- 📥 6. طلب إيداع رأس المال مع الحد الأدنى 100 USD وإمكانية النسخ -->
     <div class="section-card" style="border-color: #f57c00;">
-        <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال:</div>
+        <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
         <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
-        <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل">
-        <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
+        <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px; margin-bottom:10px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم نسخ عنوان محفظة المنصة!')">📋 نسخ عنوان المحفظة تلقائياً</button>
+        
+        <input type="number" id="depositAmount" placeholder="أدخل المبلغ المراد شحنه">
+        <div class="min-alert">⚠️ الحد الأدنى لعملية الإيداع هو 100 USD حصراً</div>
+        
+        <button class="btn-action btn-orange" onclick="handleTransaction('إيداع رأس مال', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
     </div>
 
-    <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
+    <!-- 📞 7. الدعم الفني والتواصل المباشر مع حسابك الشخصي -->
+    <a href="https://t.me" target="_blank" class="btn-action btn-support">
+        🚀 تواصل مع الدعم الفني عبر تليجرام
+    </a>
 
 <script>
     const channelUrl = 'https://jsonbin.io';
-    const apiKey = '\$2a\$10\$7R4b6/nJv/GskcZ.vNlO2uTskK0Jq6b19H7H9YhM8rR4n3CExZ6vS';
+    const apiKey = '$2a$10$7R4b6/nJv/GskcZ.vNlO2uTskK0Jq6b19H7H9YhM8rR4n3CExZ6vS';
 
     function saveUsername() {
         const name = document.getElementById('usernameInput').value.trim();
-        if(!name) return;
+        if(!name) { alert('يرجى كتابة الاسم أولاً.'); return; }
         localStorage.setItem('saved_user_name', name);
         document.getElementById('currentUsernameText').innerText = name;
-        document.getElementById('usernameForm').style.display = 'none'; // 🔒 إخفاء وقفل خانة الإدخال نهائياً
-        alert('🎯 تم التثبيت النهائي لاسم العضو!');
+        document.getElementById('usernameForm').style.display = 'none'; // قفل الخانة وحظر التعديل
+        alert('🎯 تم حفظ وتثبيت اسم العضو بنجاح ولا يمكن تعديله!');
     }
 
     function loadSavedUsername() {
         const savedName = localStorage.getItem('saved_user_name');
         if(savedName) {
             document.getElementById('currentUsernameText').innerText = savedName;
-            document.getElementById('usernameForm').style.display = 'none'; // 🔒 الحفاظ على القفل عند التحديث
+            document.getElementById('usernameForm').style.display = 'none'; // إبقاء القفل مفعلاً
         }
     }
 
     function updateLiveBalances() {
-        fetch(channelUrl, { headers: { 'X-Master-Key': apiKey } })
+        fetch(channelUrl, { headers: { 'X-Master-Key': apiKey }, cache: "no-cache" })
         .then(res => res.json())
         .then(resData => {
-            const balance = resData.record.balances;
-            if(balance) {
-                document.getElementById('displayCapital').innerText = `USDT ${parseFloat(balance.capital || 0).toFixed(2)}`;
-                document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(balance.todayProfit || 0).toFixed(2)}`;
-                document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(balance.inviteProfit || 0).toFixed(2)}`;
-            }
-        });
+            const balance = resData.record.balances || { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 };
+            document.getElementById('displayCapital').innerText = `USDT ${parseFloat(balance.capital || 0).toFixed(2)}`;
+            document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(balance.todayProfit || 0).toFixed(2)}`;
+            document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(balance.inviteProfit || 0).toFixed(2)}`;
+            document.getElementById('displayTeamCount').innerText = parseInt(balance.teamCount || 0);
+        }).catch(err => console.log('مزامنة الأرصدة...'));
     }
 
     function handleTransaction(actionType, amountId, walletId) {
-        const amount = document.getElementById(amountId).value;
+        const amount = parseFloat(document.getElementById(amountId).value);
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
+        const currentUser = localStorage.getItem('saved_user_name');
 
-        if(!amount || !wallet) return alert('يرجى ملء الحقول المطلوبة.');
+        if(!currentUser) { alert('الرجاء إدخال اسمك وتثبيته أولاً في الأعلى لقفل الحساب!'); return; }
+        if(!amount || !wallet) { alert('يرجى ملء جميع الحقول المطلوبة.'); return; }
+        if(actionType === 'إيداع رأس مال' && amount < 100) { alert('⚠️ خطأ: الحد الأدنى للإيداع هو 100 USD!'); return; }
 
         fetch(channelUrl, { headers: { 'X-Master-Key': apiKey } })
         .then(res => res.json())
         .then(resData => {
-            let serverData = resData.record || { orders: [], balances: { capital: 0, todayProfit: 0, inviteProfit: 0 } };
+            let serverData = resData.record;
             
             const newRequest = {
-                amount: parseFloat(amount) || 0,
+                id: Date.now(),
+                amount: amount,
                 wallet: wallet,
                 username: currentUser,
                 type: actionType,
@@ -137,44 +156,18 @@
                 headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
                 body: JSON.stringify(serverData)
             }).then(() => {
-                alert(`🎯 تم بنجاح إرسال طلب ${actionType} للمشرف!`);
+                alert(`🎯 تم بنجاح تقديم طلب (${actionType}) للمشرف!`);
                 if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
             });
         });
     }
 
     function sendInviteRequest() {
-        const memberName = document.getElementById('inviteMemberName').value.trim();
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
-        if(!memberName) return alert('اكتب اسم العضو أولاً');
+        const friendName = document.getElementById('inviteMemberName').value.trim();
+        const currentUser = localStorage.getItem('saved_user_name');
+
+        if(!currentUser) { alert('الرجاء إدخال اسمك وتثبيته أولاً!'); return; }
+        if(!friendName) { alert('يرجى إدخال اسم الصديق المدعو!'); return; }
 
         fetch(channelUrl, { headers: { 'X-Master-Key': apiKey } })
-        .then(res => res.json())
-        .then(resData => {
-            let serverData = resData.record;
-            const newRequest = {
-                amount: 0,
-                wallet: `العضو المدعو: ${memberName}`,
-                username: currentUser,
-                type: 'مكافأة دعوة',
-                status: 'معلق',
-                date: new Date().toLocaleString('ar-EG')
-            };
-            serverData.orders.push(newRequest);
-
-            fetch(channelUrl, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
-                body: JSON.stringify(serverData)
-            }).then(() => {
-                alert('📢 تم تقديم طلب المكافأة للمشرف بنجاح!');
-                document.getElementById('inviteMemberName').value = '';
-            });
-        });
-    }
-
-    setInterval(updateLiveBalances, 3000);
-    window.onload = function() { loadSavedUsername(); updateLiveBalances(); };
-</script>
-</body>
-</html>
+        

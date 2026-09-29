@@ -3,275 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة إيداع وسحب USDT (TRC-20)</title>
+    <title>منصة التداول الذكية</title>
     <style>
-        :root {
-            --primary-color: #00c853;
-            --secondary-color: #b71c1c;
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --text-muted: #aaaaaa;
-            --telegram-color: #0088cc;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #0b111e;
+            color: #ffffff;
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 15px;
+            direction: rtl;
         }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: var(--primary-color);
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .tabs {
-            display: flex;
-            background: #2a2a2a;
+        .section-card {
+            background-color: #111a2e;
+            border: 1px solid #1e2d4a;
             border-radius: 8px;
-            margin-bottom: 25px;
-            padding: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
-
-        .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
+        .section-title {
+            font-size: 14px;
+            color: #90a4ae;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .value-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196f3;
+            text-align: left;
+            margin: 5px 0;
+        }
+        .btn-action {
+            width: 100%;
             padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: #000;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
-            box-sizing: border-box;
-            text-align: right;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary-color);
             border: none;
-            border-radius: 8px;
-            color: #000;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
             margin-top: 10px;
         }
-
-        .btn-submit:hover {
-            background: #00a944;
-        }
-
-        .network-badge {
-            display: inline-block;
-            background: #2e7d32;
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        /* 📞 تصميم زر الدعم الفني */
-        .support-container {
-            margin-top: 30px;
-            text-align: center;
-            border-top: 1px solid #3a3a3a;
-            padding-top: 20px;
-        }
-
-        .btn-support {
-            display: inline-flex;
+        .btn-purple { background-color: #7b1fa2; color: white; }
+        .btn-red { background-color: #d32f2f; color: white; }
+        .btn-orange { background-color: #f57c00; color: white; }
+        .btn-support { 
+            background-color: #0088cc; 
+            color: white; 
+            text-decoration: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            padding: 12px;
-            background: var(--telegram-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            transition: background 0.3s;
-            box-sizing: border-box;
         }
-
-        .btn-support:hover {
-            background: #0077b3;
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #0b111e;
+            border: 1px solid #1e2d4a;
+            border-radius: 4px;
+            color: #fff;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .wallet-box {
+            background: #0b111e;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ffb74d;
+            text-align: center;
+            word-break: break-all;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>منصة التداول الذكية</h1>
-        <p>بوابة المعاملات المالية المباشرة</p>
-        <span class="network-badge">شبكة TRC-20 المدعومة</span>
+    <!-- 👤 اسم المستخدم الحالي -->
+    <div class="section-card">
+        <div class="section-title">👤 اسم المستخدم الحالي:</div>
+        <div style="color: #4fc3f7;">اللاعب الحقيقي</div>
     </div>
 
-    <!-- التبديل بين الإيداع والسحب -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('إيداع')">إيداع</button>
-        <button class="tab-btn" onclick="switchTab('سحب')">سحب</button>
+    <!-- 🏆 الجائزة الكبرى -->
+    <div class="section-card">
+        <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
+        <div class="value-display">USDT 2500</div>
+        <div style="font-size: 12px; color: #90a4ae;">أعضاء فريقك: 0 / 40</div>
     </div>
 
-    <!-- النموذج المالي -->
-    <form id="transactionForm" onsubmit="handleSubmit(event)">
-        <div class="form-group">
-            <label id="amountLabel" for="amount">المبلغ المراد إيداعه (USDT):</label>
-            <input type="number" id="amount" placeholder="0.00" step="any" required min="1">
-        </div>
-
-        <div class="form-group">
-            <label id="walletLabel" for="wallet">عنوان محفظتك الإلكترونية (TRC-20):</label>
-            <input type="text" id="wallet" placeholder="T..." required>
-        </div>
-
-        <button type="submit" id="submitBtn" class="btn-submit">تقديم طلب الإيداع للمشرف</button>
-    </form>
-
-    <!-- 📞 قسم الدعم الفني الآمن والمباشر -->
-    <div class="support-container">
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">تواجه مشكلة؟ تواصل مع الدعم الفني فوراً</p>
-        <a href="https://t.me" target="_blank" class="btn-support">
-            💬 مراسلة الدعم الفني عبر تليجرام
-        </a>
+    <!-- 🔗 تقديم طلب مكافأة دعوة -->
+    <div class="section-card">
+        <div class="section-title">🔗 تقديم طلب مكافأة دعوة:</div>
+        <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
+        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 تقديم الطلب للمشرف</button>
     </div>
-</div>
+
+    <!-- 💰 أرصدة رأس المال والأرباح -->
+    <div class="section-card">
+        <div class="section-title">💰 رأس المال الكلي:</div>
+        <div class="value-display" style="color: #ffb74d;">USDT 0.00</div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-title">📊 أرباح اليوم:</div>
+        <div class="value-display" style="color: #00e676;">USDT 0.00</div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-title">👥 أرباح الدعوة:</div>
+        <div class="value-display" style="color: #00e676;">USDT 0.00</div>
+    </div>
+
+    <!-- 🚨 لوحة عمليات السحب الفورية والآمنة -->
+    <div class="section-card" style="border-color: #d32f2f;">
+        <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية والآمنة (شبكة TRC-20 حصراً):</div>
+        <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
+        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية لشبكة TRC-20">
+        <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
+        <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
+        <button class="btn-action btn-purple" onclick="handleTransaction('سحب أرباح الدعوة', 'withdrawAmount', 'withdrawWallet')">سحب أرباح الدعوة</button>
+    </div>
+
+    <!-- 📥 طلب إيداع رأس المال -->
+    <div class="section-card" style="border-color: #f57c00;">
+        <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
+        <!-- 🚨 تم تحديث عنوان محفظتكم الجديد هنا بنجاح -->
+        <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
+        <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم نسخ العنوان!')">📋 نسخ عنوان المحفظة تلقائياً</button>
+        <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل (مثال: 100)" style="margin-top: 15px;">
+        <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
+    </div>
+
+    <!-- 📞 تواصل مع الدعم الفني عبر تليجرام -->
+    <a href="https://t.me" target="_blank" class="btn-action btn-support">
+        🚀 تواصل مع الدعم الفني عبر تليجرام
+    </a>
 
 <script>
-    let currentType = 'إيداع';
-    // الرابط الفعلي المباشر للسيرفر الخاص بكم على Vercel
     const serverUrl = 'https://vercel.app';
 
-    function switchTab(type) {
-        currentType = type;
-        const buttons = document.querySelectorAll('.tab-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        
-        // منع التكرار البرمجي
-        if(event) {
-            event.target.classList.add('active');
+    function handleTransaction(actionType, amountId, walletId) {
+        const amount = document.getElementById(amountId).value;
+        const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
+
+        if(!amount || !wallet) {
+            alert('يرجى ملء جميع الحقول المطلوبة أولاً.');
+            return;
         }
-
-        const amountLabel = document.getElementById('amountLabel');
-        const walletLabel = document.getElementById('walletLabel');
-        const submitBtn = document.getElementById('submitBtn');
-
-        if (type === 'إيداع') {
-            amountLabel.innerText = 'المبلغ المراد إيداعه (USDT):';
-            walletLabel.innerText = 'عنوان محفظتك الإلكترونية (TRC-20):';
-            submitBtn.innerText = 'تقديم طلب الإيداع للمشرف';
-            submitBtn.style.backgroundColor = '#00c853';
-            submitBtn.style.color = '#000';
-        } else {
-            amountLabel.innerText = 'المبلغ المراد سحبه (USDT):';
-            walletLabel.innerText = 'عنوان المحفظة المراد السحب إليها (TRC-20):';
-            submitBtn.innerText = 'تقديم طلب السحب للمشرف';
-            submitBtn.style.backgroundColor = '#b71c1c';
-            submitBtn.style.color = '#fff';
-        }
-    }
-
-    function handleSubmit(event) {
-        event.preventDefault();
-        const amount = document.getElementById('amount').value;
-        const wallet = document.getElementById('wallet').value;
-        const submitBtn = document.getElementById('submitBtn');
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'جاري إرسال الطلب...';
 
         fetch(serverUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: amount, wallet: wallet, type: currentType })
+            body: JSON.stringify({ amount: amount, wallet: wallet, type: actionType })
         })
-        .then(response => {
-            if (!response.ok) throw new Error('فشل الاستجابة من السيرفر');
-            return response.json();
-        })
+        .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                alert(`🎯 تم بنجاح إرسال طلب الـ ${currentType} للمشرف وهو قيد المراجعة.`);
-                document.getElementById('transactionForm').reset();
+            if(data.success) {
+                alert(`🎯 تم إرسال طلب (${actionType}) للمشرف بنجاح!`);
+                if(amountId !== 'adminWalletAddress' && document.getElementById(amountId)) {
+                    document.getElementById(amountId).value = '';
+                }
             } else {
-                alert('عذراً: رفض السيرفر استقبال الطلب.');
+                alert('فشل إرسال الطلب، يرجى المحاولة لاحقاً.');
             }
         })
-        .catch(error => {
-            alert('خطأ في الاتصال بالسيرفر. تأكد من رفع كود server.js الأخير بنجاح.');
+        .catch(err => alert('خطأ في الاتصال بالسيرفر.'));
+    }
+
+    function sendInviteRequest() {
+        const memberName = document.getElementById('inviteMemberName').value;
+        if(!memberName) {
+            alert('يرجى كتابة اسم العضو أولاً.');
+            return;
+        }
+        fetch(serverUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: 'طلب مكافأة', wallet: memberName, type: 'مكافأة دعوة' })
         })
-        .finally(() => {
-            submitBtn.disabled = false;
-            switchTab(currentType);
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert('📢 تم تقديم طلب المكافأة للمشرف بنجاح!');
+                document.getElementById('inviteMemberName').value = '';
+            }
         });
     }
 </script>

@@ -18,8 +18,8 @@
         .btn { padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 5px; }
         .btn-success { background-color: #00e676; color: #000; }
         .btn-danger { background-color: #ff5252; color: #fff; }
-        .btn-copy { background-color: #334155; color: #ffb74d; padding: 4px 8px; font-size: 12px; border-radius: 4px; margin-right: 5px; }
-        .btn-distribute { background-color: #f57c00; color: white; padding: 12px 30px; font-size: 15px; border-radius: 6px; }
+        .btn-copy { background-color: #334155; color: #ffb74d; padding: 4px 8px; font-size: 12px; border-radius: 4px; margin-right: 5px; border: none; cursor: pointer; }
+        .btn-distribute { background-color: #f57c00; color: white; padding: 12px 30px; font-size: 15px; border-radius: 6px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -27,7 +27,6 @@
     <div class="admin-container">
         <h1>🖥️ لوحة تحكم المشرف السحابية</h1>
         
-        <!-- 👥 إظهار عداد إجمالي أعداد المستخدمين المسجلين في المنصة -->
         <div class="stats-bar">
             <div class="stat-card">
                 <div style="color: #90a4ae; font-size: 14px;">👥 إجمالي عدد الأعضاء المسجلين:</div>
@@ -35,11 +34,10 @@
             </div>
         </div>
 
-        <!-- 💰 زر التوزيع اليدوي للأرباح اليومية -->
         <div class="profit-action-card">
             <h3 style="margin-top:0; color:#ffb74d;">⚙️ الإجراءات الجماعية اليومية:</h3>
             <p style="font-size:13px; color:#90a4ae;">الضغط على هذا الزر يضيف ربح 15% فوراً لجميع الحسابات التي تمتلك رأس مال مشحون فقط:</p>
-            <button class="btn btn-distribute" onclick="triggerDailyDistribution()">💰 توزيع الأرباح اليومية المباشرة (15%)</button>
+            <button class="btn-distribute" onclick="triggerDailyDistribution()">💰 توزيع الأرباح اليومية المباشرة (15%)</button>
         </div>
 
         <h2>📥 طلبات الأعضاء المنتظرة</h2>
@@ -72,6 +70,7 @@
     </div>
 
 <script>
+    // الربط المباشر برابط سيرفر Vercel السحابي الخاص بكم
     const CLOUD_SERVER_URL = "https://vercel.app";
 
     function refreshLiveAdminData() {
@@ -83,8 +82,6 @@
             orders.forEach(order => {
                 const infoAmount = order.amount ? `${order.amount} USDT` : 'طلب مكافأة';
                 const infoAddress = order.wallet ? order.wallet : `صديق: ${order.friendName}`;
-                
-                // إضافة زر النسخ للمحفظة برمجياً
                 const copyButtonHtml = order.wallet ? `<button class="btn btn-copy" onclick="navigator.clipboard.writeText('${order.wallet}'); alert('تم نسخ عنوان المحفظة!')">📋 نسخ</button>` : '';
 
                 tbody.innerHTML += `
@@ -109,7 +106,6 @@
             const tbody = document.getElementById('profitsTableBody');
             tbody.innerHTML = Object.keys(users).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد بيانات مسجلة...</td></tr>` : '';
             
-            // تحديث عداد أعداد المستخدمين الإجمالي في الواجهة
             const totalUsers = Object.keys(users).length;
             document.getElementById('totalUsersCount').innerText = totalUsers;
 

@@ -71,10 +71,11 @@
         .request-card {
             background: #2a2a2a;
             border-left: 4px solid var(--primary-color);
-            padding: 15px;
+            padding: 18px;
             border-radius: 8px;
             margin-bottom: 15px;
             position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .request-card.withdraw-type {
@@ -82,16 +83,60 @@
         }
 
         .request-card p {
-            margin: 6px 0;
+            margin: 8px 0;
             font-size: 15px;
         }
+
+        .wallet-container {
+            background: #111;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #3a3a3a;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wallet-text {
+            font-family: monospace;
+            font-size: 14px;
+            color: #ffb74d;
+            word-break: break-all;
+            user-select: all;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-status {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-approve { background-color: #2e7d32; color: white; }
+        .btn-approve:hover { background-color: #1b5e20; }
+        
+        .btn-reject { background-color: #c62828; color: white; }
+        .btn-reject:hover { background-color: #b71c1c; }
 
         .request-meta {
             display: flex;
             justify-content: space-between;
             color: var(--text-muted);
             font-size: 12px;
-            margin-top: 10px;
+            margin-top: 12px;
+            border-top: 1px solid #3a3a3a;
+            padding-top: 8px;
         }
 
         .btn-clear {
@@ -121,16 +166,16 @@
         }
 
         .copy-btn {
-            background: #444;
+            background: #0088cc;
             border: none;
             color: #fff;
-            padding: 2px 6px;
+            padding: 6px 12px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 13px;
             cursor: pointer;
-            margin-right: 5px;
+            font-weight: bold;
         }
-        .copy-btn:hover { background: #555; }
+        .copy-btn:hover { background: #0077b3; }
     </style>
 </head>
 <body>
@@ -151,10 +196,8 @@
     <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة ومسح السجلات</button>
 </div>
 
-<!-- ⚙️ تم إضافة وسم البداية الصحيح هنا -->
 <script>
     function loadAdminRequests() {
-        // جلب البيانات من المخزن الثابت والمباشر للواجهة دون الحاجة للسيرفر المعطل
         const requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
         const container = document.getElementById('requestsContainer');
         
@@ -170,23 +213,51 @@
             const isWithdraw = req.type && req.type.includes('سحب');
             const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
             const typeColor = isWithdraw ? '#ff5252' : '#00e676';
+            
+            // تحديد أيقونة ولون الحالة بناءً على قرار المشرف
+            let statusIcon = '⏳';
+            let statusColor = '#fff';
+            if (req.status === 'تم القبول') { statusIcon = '✅'; statusColor = '#00e676'; }
+            if (req.status === 'تم الرفض') { statusIcon = '❌'; statusColor = '#ff5252'; }
 
             const cardHtml = `
                 <div class="${cardClass}">
                     <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
                     <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
-                    <p><strong>عنوان محفظة العميل:</strong> 
-                        <span style="font-family: monospace; background: #111; padding: 4px; border-radius: 4px; font-size: 13px;">${req.wallet}</span>
-                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ المحفظة!')">نسخ</button>
-                    </p>
+                    
+                    <!-- 📋 مستطيل عرض المحفظة المطور مع زر النسخ السريع -->
+                    <div class="wallet-container">
+                        <div class="wallet-text" id="wallet_${req.id}">${req.wallet}</div>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ عنوان المحفظة بنجاح!')">📋 نسخ</button>
+                    </div>
+
+                    <!-- 🔘 أزرار التحكم بالموافقة والرفض المضافة حديثاً -->
+                    <div class="action-buttons" id="actions_${req.id}" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
+                        <button class="btn-status btn-approve" onclick="updateStatus(${req.id}, 'تم القبول')">موافق 👍</button>
+                        <button class="btn-status btn-reject" onclick="updateStatus(${req.id}, 'تم الرفض')">رفض 👎</button>
+                    </div>
+
                     <div class="request-meta">
-                        <span>حالة الطلب: ⏳ معلق</span>
+                        <span>حالة الطلب: <span style="color: ${statusColor}; font-weight: bold;">${statusIcon} ${req.status}</span></span>
                         <span>توقيت الإرسال: ${req.date || 'غير محدد'}</span>
                     </div>
                 </div>
             `;
             container.innerHTML += cardHtml;
         });
+    }
+
+    // دالة لتحديث حالة الطلب عند الضغط على موافق أو رفض
+    function updateStatus(id, newStatus) {
+        let requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        requests = requests.map(req => {
+            if (req.id === id || (req.date && !req.id)) { 
+                req.status = newStatus;
+            }
+            return req;
+        });
+        localStorage.setItem('admin_orders', JSON.stringify(requests));
+        loadAdminRequests(); // تحديث فوري للشاشة
     }
 
     function clearAllRequests() {
@@ -196,11 +267,10 @@
         }
     }
 
-    // تحديث فوري مستمر كل ثانيتين
+    // تحديث اللوحة تلقائياً كل ثانيتين
     setInterval(loadAdminRequests, 2000);
     window.onload = loadAdminRequests;
-</script> 
-<!-- ⚙️ تم إغلاق الوسم البرمجي بشكل صحيح هنا -->
+</script>
 
 </body>
 </html>

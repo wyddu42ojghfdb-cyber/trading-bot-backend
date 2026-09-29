@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="tr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التداول الذكية</title>
+    <title>Akıllı Ticaret Platformu</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,7 +11,6 @@
             color: #ffffff;
             margin: 0;
             padding: 15px;
-            direction: rtl;
         }
         .section-card {
             background-color: #111a2e;
@@ -65,7 +64,6 @@
             color: #fff;
             box-sizing: border-box;
             margin-bottom: 10px;
-            text-align: right;
         }
         .wallet-box {
             background: #0b111e;
@@ -81,83 +79,72 @@
 </head>
 <body>
 
-    <!-- 👤 اسم المستخدم الحالي -->
+    <!-- 👤 Kullanıcı Adı -->
     <div class="section-card">
-        <div class="section-title">👤 اسم المستخدم الحالي:</div>
-        <div style="color: #4fc3f7;">اللاعب الحقيقي</div>
+        <div class="section-title">👤 Mevcut Kullanıcı Adı:</div>
+        <div style="color: #4fc3f7;">Gerçek oyuncu</div>
     </div>
 
-    <!-- 🏆 الجائزة الكبرى -->
+    <!-- 🏆 Büyük Ödül -->
     <div class="section-card">
-        <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
-        <div class="value-display">USDT 2500</div>
-        <div style="font-size: 12px; color: #90a4ae;">أعضاء فريقك: 0 / 40</div>
+        <div class="section-title">🏆 Büyük Ödül (40 üye):</div>
+        <div class="value-display">2500 USDT</div>
+        <div style="font-size: 12px; color: #90a4ae;">Ekip üyeleriniz: 0 / 40</div>
     </div>
 
-    <!-- 🔗 تقديم طلب مكافأة دعوة -->
+    <!-- 🔗 Davet Talebi -->
     <div class="section-card">
-        <div class="section-title">🔗 تقديم طلب مكافأة دعوة:</div>
-        <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
-        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 تقديم الطلب للمشرف</button>
+        <div class="section-title">🔗 Davet bonusu talebi gönderin:</div>
+        <input type="text" id="inviteMemberName" placeholder="Davet edilen üyenin adı">
+        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 Talebi amire iletin</button>
     </div>
 
-    <!-- 💰 أرصدة رأس المال والأرباح -->
+    <!-- 💰 Sermaye ve Kâr Alanları -->
     <div class="section-card">
-        <div class="section-title">💰 رأس المال الكلي:</div>
-        <div class="value-display" style="color: #ffb74d;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">📊 أرباح اليوم:</div>
-        <div class="value-display" style="color: #00e676;">USDT 0.00</div>
+        <div class="section-title">💰 Toplam sermaye:</div>
+        <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0,00</div>
     </div>
 
     <div class="section-card">
-        <div class="section-title">👥 أرباح الدعوة:</div>
-        <div class="value-display" style="color: #00e676;">USDT 0.00</div>
+        <div class="section-title">📊 Bugünkü kârlar:</div>
+        <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0,00</div>
     </div>
 
-    <!-- 🚨 لوحة عمليات السحب الفورية والآمنة -->
+    <div class="section-card">
+        <div class="section-title">👥 Davetiye kazançları:</div>
+        <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0,00</div>
+    </div>
+
+    <!-- 🚨 Para Çekme -->
     <div class="section-card" style="border-color: #d32f2f;">
-        <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية والآمنة (شبكة TRC-20 حصراً):</div>
-        <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
-        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية لشبكة TRC-20">
+        <div class="section-title" style="color: #ff5252;">🚨 Anında ve güvenli para çekme işlemleri paneli (yalnızca TRC-20 ağı):</div>
+        <input type="number" id="withdrawAmount" placeholder="USDT cinsinden tutar">
+        <input type="text" id="withdrawWallet" placeholder="Kişisel TRC-20 ağ cüzdan adresinizi girin">
         <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
         <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
         <button class="btn-action btn-purple" onclick="handleTransaction('سحب أرباح الدعوة', 'withdrawAmount', 'withdrawWallet')">سحب أرباح الدعوة</button>
     </div>
 
-    <!-- 📥 طلب إيداع رأس المال -->
+    <!-- 📥 Para Yatırma -->
     <div class="section-card" style="border-color: #f57c00;">
         <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
         <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
-        <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم نسخ العنوان!')">📋 نسخ عنوان المحفظة تلقائياً</button>
+        <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('Cüzdan kopyalandı!')">📋 Cüzdan adresini otomatik kopyala</button>
         <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل (مثال: 100)" style="margin-top: 15px;">
         <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
     </div>
 
-    <!-- 📞 تواصل مع الدعم الفني عبر تليجرام -->
     <a href="https://t.me" target="_blank" class="btn-action btn-support">
-        🚀 تواصل مع الدعم الفني عبر تليجرام
+        🚀 Telegram üzerinden teknik destekle iletişime geçin
     </a>
 
 <script>
-    const serverUrl = 'https://vercel.app';
-
-    // حفظ الطلب محلياً وإرساله في نفس الوقت للسيرفر
-    function saveAndSendRequest(newRequest) {
-        // جلب الطلبات القديمة المخزنة محلياً
-        let localData = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        localData.push(newRequest);
-        // حفظ التحديث الجديد لتقرأه شاشة المشرف مباشرة
-        localStorage.setItem('admin_orders', JSON.stringify(localData));
-
-        // إرسال احتياطي للسيرفر
-        fetch(serverUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newRequest)
-        }).catch(err => console.log('خطأ السيرفر السحابي المتوقع'));
+    // تحديث الأرقام حياً على الشاشة من الذاكرة المشتركة
+    function updateLiveBalances() {
+        const balance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+        document.getElementById('displayCapital').innerText = `USDT ${balance.capital.toFixed(2).replace('.', ',')}`;
+        document.getElementById('displayTodayProfit').innerText = `USDT ${balance.todayProfit.toFixed(2).replace('.', ',')}`;
+        document.getElementById('displayInviteProfit').innerText = `USDT ${balance.inviteProfit.toFixed(2).replace('.', ',')}`;
     }
 
     function handleTransaction(actionType, amountId, walletId) {
@@ -165,11 +152,12 @@
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
 
         if(!amount || !wallet) {
-            alert('يرجى ملء جميع الحقول المطلوبة أولاً.');
+            alert('Lütfen tüm alanları doldurun.');
             return;
         }
 
         const newRequest = {
+            id: Date.now(),
             amount: amount,
             wallet: wallet,
             type: actionType,
@@ -177,31 +165,35 @@
             date: new Date().toLocaleString('ar-EG')
         };
 
-        saveAndSendRequest(newRequest);
-        alert(`🎯 تم إرسال طلب (${actionType}) للمشرف بنجاح!`);
-        if(amountId !== 'adminWalletAddress' && document.getElementById(amountId)) {
-            document.getElementById(amountId).value = '';
-        }
+        let localData = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        localData.push(newRequest);
+        localStorage.setItem('admin_orders', JSON.stringify(localData));
+
+        alert('Talebiniz başarıyla amire iletildi!');
+        if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
     }
 
     function sendInviteRequest() {
         const memberName = document.getElementById('inviteMemberName').value;
-        if(!memberName) {
-            alert('يرجى كتابة اسم العضو أولاً.');
-            return;
-        }
+        if(!memberName) return;
         const newRequest = {
-            amount: 'طلب مكافأة',
+            id: Date.now(),
+            amount: '0',
             wallet: memberName,
             type: 'مكافأة دعوة',
             status: 'معلق',
             date: new Date().toLocaleString('ar-EG')
         };
-        saveAndSendRequest(newRequest);
-        alert('📢 تم تقديم طلب المكافأة للمشرف بنجاح!');
+        let localData = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        localData.push(newRequest);
+        localStorage.setItem('admin_orders', JSON.stringify(localData));
+        alert('Talebiniz başarıyla iletildi!');
         document.getElementById('inviteMemberName').value = '';
     }
-</script>
 
+    // فحص وتحديث دوري للأرصدة كل ثانيتين لمراقبة موافقة الأدمن
+    setInterval(updateLiveBalances, 2000);
+    window.onload = updateLiveBalances;
+</script>
 </body>
 </html>

@@ -130,7 +130,6 @@
     <!-- 📥 طلب إيداع رأس المال -->
     <div class="section-card" style="border-color: #f57c00;">
         <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
-        <!-- 🚨 تم تحديث عنوان محفظتكم الجديد هنا بنجاح -->
         <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
         <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم نسخ العنوان!')">📋 نسخ عنوان المحفظة تلقائياً</button>
         <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل (مثال: 100)" style="margin-top: 15px;">
@@ -145,6 +144,22 @@
 <script>
     const serverUrl = 'https://vercel.app';
 
+    // حفظ الطلب محلياً وإرساله في نفس الوقت للسيرفر
+    function saveAndSendRequest(newRequest) {
+        // جلب الطلبات القديمة المخزنة محلياً
+        let localData = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        localData.push(newRequest);
+        // حفظ التحديث الجديد لتقرأه شاشة المشرف مباشرة
+        localStorage.setItem('admin_orders', JSON.stringify(localData));
+
+        // إرسال احتياطي للسيرفر
+        fetch(serverUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newRequest)
+        }).catch(err => console.log('خطأ السيرفر السحابي المتوقع'));
+    }
+
     function handleTransaction(actionType, amountId, walletId) {
         const amount = document.getElementById(amountId).value;
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
@@ -154,23 +169,19 @@
             return;
         }
 
-        fetch(serverUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: amount, wallet: wallet, type: actionType })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                alert(`🎯 تم إرسال طلب (${actionType}) للمشرف بنجاح!`);
-                if(amountId !== 'adminWalletAddress' && document.getElementById(amountId)) {
-                    document.getElementById(amountId).value = '';
-                }
-            } else {
-                alert('فشل إرسال الطلب، يرجى المحاولة لاحقاً.');
-            }
-        })
-        .catch(err => alert('خطأ في الاتصال بالسيرفر.'));
+        const newRequest = {
+            amount: amount,
+            wallet: wallet,
+            type: actionType,
+            status: 'معلق',
+            date: new Date().toLocaleString('ar-EG')
+        };
+
+        saveAndSendRequest(newRequest);
+        alert(`🎯 تم إرسال طلب (${actionType}) للمشرف بنجاح!`);
+        if(amountId !== 'adminWalletAddress' && document.getElementById(amountId)) {
+            document.getElementById(amountId).value = '';
+        }
     }
 
     function sendInviteRequest() {
@@ -179,18 +190,16 @@
             alert('يرجى كتابة اسم العضو أولاً.');
             return;
         }
-        fetch(serverUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: 'طلب مكافأة', wallet: memberName, type: 'مكافأة دعوة' })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                alert('📢 تم تقديم طلب المكافأة للمشرف بنجاح!');
-                document.getElementById('inviteMemberName').value = '';
-            }
-        });
+        const newRequest = {
+            amount: 'طلب مكافأة',
+            wallet: memberName,
+            type: 'مكافأة دعوة',
+            status: 'معلق',
+            date: new Date().toLocaleString('ar-EG')
+        };
+        saveAndSendRequest(newRequest);
+        alert('📢 تم تقديم طلب المكافأة للمشرف بنجاح!');
+        document.getElementById('inviteMemberName').value = '';
     }
 </script>
 

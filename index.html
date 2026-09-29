@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة التداول الذكية</title>
-    <!-- استدعاء مكتبة Firebase لربط الشاشات تلقائياً -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
         .section-card { background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
@@ -20,7 +17,7 @@
         .btn-blue { background-color: #1976d2; color: white; padding: 10px; }
         .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         input { width: 100%; padding: 12px; background: #0b111e; border: 1px solid #1e2d4a; border-radius: 4px; color: #fff; box-sizing: border-box; margin-bottom: 5px; text-align: right; }
-        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; }
+        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; font-size: 13px; word-break: break-all; }
         .min-alert { font-size: 12px; color: #ff5252; margin-top: 5px; font-weight: bold; }
     </style>
 </head>
@@ -43,7 +40,7 @@
         <div style="font-size: 13px; color: #90a4ae; margin-top: 5px;">أعضاء فريقك النَشطين: <span id="displayTeamCount" style="color:#00e676; font-weight:bold;">0</span> / 40</div>
     </div>
 
-    <!-- 🔗 3. تقديم طلب مكافأة دعوة (يرسل للمشرف) -->
+    <!-- 🔗 3. طلب مكافأة دعوة (يرسل للمشرف) -->
     <div class="section-card">
         <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
         <input type="text" id="inviteMemberName" placeholder="اسم الصديق المدعو">
@@ -60,7 +57,7 @@
         <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
     </div>
 
-    <!-- 🚨 5. لوحة عمليات السحب (ترسل للمشرف) -->
+    <!-- 🚨 5. لوحة السحب (ترسل للمشرف) -->
     <div class="section-card" style="border-color: #d32f2f;">
         <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية (شبكة TRC-20):</div>
         <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
@@ -78,25 +75,10 @@
         <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
     </div>
 
-    <!-- 📞 7. زر الدعم الفني فقط يتوجه إلى تليجرام لحسابك الشخصي -->
+    <!-- 📞 7. زر الدعم الفني فقط يتوجه إلى تليجرام لحسابك الشخصي لحل المشكلات يدوياً -->
     <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
 
 <script>
-    // ⚙️ إعدادات الربط المباشر بـ Firebase (يجب على والدك وضع إعدادات مشروعه هنا ليتم الاتصال بين الشاشتين)
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_://firebaseapp.com",
-        databaseURL: "https://YOUR_://firebaseio.com",
-        projectId: "YOUR_PROJECT",
-        storageBucket: "YOUR_://appspot.com",
-        messagingSenderId: "YOUR_ID",
-        appId: "YOUR_APP_ID"
-    };
-    
-    // تشغيل الاتصال
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-    const database = firebase.database();
-
     if(!localStorage.getItem('local_capital')) localStorage.setItem('local_capital', '0');
     if(!localStorage.getItem('local_todayProfit')) localStorage.setItem('local_todayProfit', '0');
     if(!localStorage.getItem('local_teamCount')) localStorage.setItem('local_teamCount', '0');
@@ -107,9 +89,9 @@
         localStorage.setItem('saved_user_name', name);
         document.getElementById('currentUsernameText').innerText = name;
         document.getElementById('usernameForm').style.display = 'none';
-        alert('🎯 تم التثبيت بنجاح!');
+        alert('🎯 تم التثبيت وقفل الحساب بنجاح!');
         updateLiveBalances();
-        listenToAdminUpdates(name);
+        startCheckingStatus();
     }
 
     function loadSavedUsername() {
@@ -117,7 +99,7 @@
         if(savedName) {
             document.getElementById('currentUsernameText').innerText = savedName;
             document.getElementById('usernameForm').style.display = 'none';
-            listenToAdminUpdates(savedName);
+            startCheckingStatus();
         }
     }
 
@@ -127,31 +109,45 @@
         document.getElementById('displayTeamCount').innerText = parseInt(localStorage.getItem('local_teamCount'));
     }
 
-    // إرسال طلبات الإيداع والسحب مباشرة إلى شاشة المشرف
+    // إرسال الطلبات للسيرفر الخاص بـ لوحة تحكم المشرف مباشرة
+    function sendOrderToServer(orderData) {
+        fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert('🎯 تم توجيه طلبك بنجاح إلى شاشة المشرف لطلب المعالجة والموافقة!');
+            }
+        })
+        .catch(err => {
+            console.error('خطأ:', err);
+            alert('⚠️ لم يتم استقبال الطلب. تأكد من أن سيرفر لوحة التحكم قيد التشغيل!');
+        });
+    }
+
     function handleTransaction(type, amountId, walletId) {
         const amount = parseFloat(document.getElementById(amountId).value);
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
         const currentUser = localStorage.getItem('saved_user_name');
 
-        if(!currentUser) { alert('الرجاء إدخال اسمك وتثبيته أولاً!'); return; }
+        if(!currentUser) { alert('الرجاء إدخال اسمك أولاً في الأعلى لقفل الحساب!'); return; }
         if(!amount || !wallet) { alert('يرجى ملء الحقول أولاً.'); return; }
         if(type === 'إيداع' && amount < 100) { alert('⚠️ الحد الأدنى للإيداع هو 100 USD!'); return; }
 
-        // إرسال الطلب لقاعدة البيانات لتظهر فوراً في شاشة المشرف
-        database.ref('orders/').push({
+        sendOrderToServer({
             username: currentUser,
             type: type,
             amount: amount,
             wallet: wallet,
-            status: 'قيد الانتظار',
             timestamp: Date.now()
-        }).then(() => {
-            alert('🎯 تم إرسال الطلب بنجاح إلى شاشة المشرف، يرجى انتظار الموافقة!');
-            if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
         });
+
+        if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
     }
 
-    // إرسال طلب مكافأة الدعوة إلى شاشة المشرف
     function sendInviteRequest() {
         const friendName = document.getElementById('inviteMemberName').value.trim();
         const currentUser = localStorage.getItem('saved_user_name');
@@ -159,23 +155,40 @@
         if(!currentUser) { alert('الرجاء إدخال اسمك وتثبيته أولاً!'); return; }
         if(!friendName) { alert('يرجى إدخال اسم الصديق!'); return; }
 
-        database.ref('orders/').push({
+        sendOrderToServer({
             username: currentUser,
             type: 'مكافأة دعوة',
             friendName: friendName,
-            status: 'قيد الانتظار',
             timestamp: Date.now()
-        }).then(() => {
-            alert('📢 تم إرسال طلب المكافأة للمشرف بنجاح!');
-            document.getElementById('inviteMemberName').value = '';
         });
+        
+        document.getElementById('inviteMemberName').value = '';
     }
 
-    // الاستماع لشاشة المشرف (عندما يضغط المشرف قبول، يتحدث رصيد المستخدم تلقائياً فوراً!)
-    function listenToAdminUpdates(username) {
-        database.ref('users/' + username).on('value', (snapshot) => {
-            const data = snapshot.val();
-            if(data) {
-                if(data.capital) localStorage.setItem('local_capital', data.capital);
-                if(data.todayProfit) localStorage.setItem('local_todayProfit', data.todayProfit);
-                
+    // الاستماع الدوري لتحديثات المشرف لتلقي الموافقة والرفض تلقائياً دون تجميد الموقع
+    function startCheckingStatus() {
+        const currentUser = localStorage.getItem('saved_user_name');
+        if(!currentUser) return;
+
+        setInterval(() => {
+            fetch(`/api/users/${currentUser}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data) {
+                    localStorage.setItem('local_capital', data.capital || 0);
+                    localStorage.setItem('local_todayProfit', data.todayProfit || 0);
+                    localStorage.setItem('local_teamCount', data.teamCount || 0);
+                    updateLiveBalances();
+                }
+            })
+            .catch(err => console.log('بانتظار إجراء المشرف...'));
+        }, 4000);
+    }
+
+    window.onload = function() {
+        loadSavedUsername();
+        updateLiveBalances();
+    };
+</script>
+</body>
+</html>

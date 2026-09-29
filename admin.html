@@ -1,138 +1,227 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="notranslate" translate="no">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف المركزي</title>
+    <title>لوحة تحكم المشرف - مراقبة المعاملات</title>
     <style>
-        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 15px; text-align: center; }
-        .card { background-color: #151d30; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #233253; }
-        button { width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-magic { background: #fd7e14; color: white; font-size: 16px; box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3); }
-        .btn-approve { background: #28a745; color: white; width: 45%; margin: 2%; display: inline-block; padding: 8px; }
-        .btn-reject { background: #dc3545; color: white; width: 45%; margin: 2%; display: inline-block; padding: 8px; }
-        .val { font-size: 24px; color: #ffc107; margin-top: 5px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        th, td { padding: 10px; border: 1px solid #233253; text-align: center; }
-        th { background: #1f2b45; color: #4e97ff; }
-        .status-box { background: #1f2b45; padding: 10px; border-radius: 5px; margin-top: 5px; display: inline-block; width: 45%; margin-right: 2%; }
-        input { background: #0b0f19; color: white; border: 1px solid #233253; padding: 6px; border-radius: 4px; text-align: center; width: 80px; }
+        :root {
+            --primary-color: #00c853;
+            --danger-color: #b71c1c;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #3a3a3a;
+            padding-bottom: 15px;
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin: 0 0 5px 0;
+        }
+
+        .admin-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #1b5e20;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .requests-list {
+            margin-top: 20px;
+            min-height: 150px;
+        }
+
+        .request-card {
+            background: #2a2a2a;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .request-card.withdraw-type {
+            border-left-color: var(--danger-color);
+        }
+
+        .request-card p {
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        .request-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-clear:hover {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .copy-btn:hover { background: #555; }
     </style>
 </head>
 <body>
 
-    <div class="card" style="border-color: #fd7e14;">
-        <h2>⚙️ لوحة تتبع وإدارة عمليات المنصة الحية</h2>
-        <button class="btn-magic" onclick="triggerMagic()">🚀 تفعيل وتوزيع أرباح الصفقة الحالية (+15%)</button>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>لوحة تتبع المعاملات الحية</h1>
+        <p>شاشة مراقبة طلبات الإيداع والسحب الخاصة بالمشرف</p>
+        <div id="liveStatus" class="status-badge">جاري الاتصال بالسيرفر الحقيقي...</div>
     </div>
 
-    <div class="card">
-        <span>📊 إحصائيات النشاط العام للمشتركين الحالية:</span>
-        <br>
-        <div class="status-box">🟢 نشط: <span id="activeCount" style="color:#28a745; font-weight:bold;">0</span></div>
-        <div class="status-box">🔴 غير نشط: <span id="inactiveCount" style="color:#dc3545; font-weight:bold;">0</span></div>
+    <!-- قائمة عرض الطلبات المستلمة -->
+    <div class="requests-list" id="requestsContainer">
+        <div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>
     </div>
 
-    <div class="card" style="border-color: #4e97ff;">
-        <h3>📥 طلبات الأعضاء المعلقة الحالية (إيداع / سحب / مكافآت):</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>اسم العضو</th>
-                    <th>نوع الطلب</th>
-                    <th>المبلغ / التفاصيل</th>
-                    <th>المحفظة الذكية (TRC-20)</th>
-                    <th>التحكم والموافقة</th>
-                </tr>
-            </thead>
-            <tbody id="requestTable">
-                <tr><td colspan="5">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- زر تنظيف اللوحة -->
+    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة ومسح السجلات</button>
+</div>
 
-    <script>
-        async function fetchAdminData() {
-            try {
-                var statsRes = await fetch('/api/admin/stats');
-                var stats = await statsRes.json();
-                document.getElementById('activeCount').textContent = stats.active;
-                document.getElementById('inactiveCount').textContent = stats.inactive;
+<script>
+    // الرابط الفعلي المحدث للـ API الخاص بالسيرفر على Vercel
+    const getRequestsUrl = 'https://vercel.app';
+    const clearRequestsUrl = 'https://vercel.app';
 
-                var reqRes = await fetch('/api/admin/requests/pending');
-                var reqData = await reqRes.json();
-                var tableBody = document.getElementById('requestTable');
-                tableBody.innerHTML = '';
+    // دالة لجلب الطلبات وعرضها تلقائياً
+    function loadAdminRequests() {
+        fetch(getRequestsUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('فشل الاتصال');
+            return response.json();
+        })
+        .then(requests => {
+            document.getElementById('liveStatus').innerText = '🟢 متصل ومراقب حي';
+            document.getElementById('liveStatus').style.backgroundColor = '#1b5e20';
+            
+            const container = document.getElementById('requestsContainer');
+            container.innerHTML = ''; 
 
-                if (reqData.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</td></tr>';
-                } else {
-                    reqData.forEach(function(item) {
-                        var typeText = '';
-                        var detailsText = item.amount + ' USDT';
-                        
-                        if (item.type === 'deposit') typeText = '📥 إيداع رأس مال';
-                        if (item.type === 'balance') typeText = '💸 سحب كلي';
-                        if (item.type === 'today') typeText = '📈 سحب أرباح اليوم';
-                        if (item.type === 'referral') typeText = '👥 سحب أرباح دعوة';
-                        if (item.type === 'referral_bonus') {
-                            typeText = '🎁 طلب مكافأة دعوة';
-                            detailsText = 'دعا العضو: <span style="color:#ffc107;">' + item.invitedUser + '</span>';
-                        }
+            if (requests.length === 0) {
+                container.innerHTML = '<div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>';
+                return;
+            }
 
-                        var walletText = item.wallet ? item.wallet : '---';
-                        var actionHtml = '';
+            // ترتيب الطلبات لتظهر الأحدث في الأعلى دائماً
+            requests.reverse().forEach(req => {
+                const isWithdraw = req.type === 'سحب';
+                const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
+                const typeColor = isWithdraw ? '#ff5252' : '#00e676';
 
-                        if (item.type === 'referral_bonus') {
-                            actionHtml = '<input type="number" id="bonus_' + item.id + '" placeholder="المكافأة" value="10"> ' +
-                                         '<br><button class="btn-approve" onclick="processRequest(' + item.id + ', \'approve\')">موافق</button>' +
-                                         '<button class="btn-reject" onclick="processRequest(' + item.id + ', \'reject\')">رفض</button>';
-                        } else {
-                            actionHtml = '<button class="btn-approve" onclick="processRequest(' + item.id + ', \'approve\')">موافق</button>' +
-                                         '<button class="btn-reject" onclick="processRequest(' + item.id + ', \'reject\')">رفض</button>';
-                        }
+                const cardHtml = `
+                    <div class="${cardClass}">
+                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
+                        <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
+                        <p><strong>عنوان محفظة العميل:</strong> 
+                            <span style="font-family: monospace; background: #111; padding: 4px; border-radius: 4px; font-size: 13px;">${req.wallet}</span>
+                            <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ المحفظة!')">نسخ</button>
+                        </p>
+                        <div class="request-meta">
+                            <span>حالة الطلب: ⏳ ${req.status}</span>
+                            <span>توقيت الإرسال: ${req.date}</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching admin logs:', error);
+            document.getElementById('liveStatus').innerText = '🔴 خطأ في اتصال السيرفر';
+            document.getElementById('liveStatus').style.backgroundColor = '#b71c1c';
+        });
+    }
 
-                        tableBody.innerHTML += '<tr>' +
-                            '<td style="font-weight:bold; color:#4e97ff;">' + item.username + '</td>' +
-                            '<td>' + typeText + '</td>' +
-                            '<td>' + detailsText + '</td>' +
-                            '<td style="color:#ffc107; font-family:monospace; font-size:11px;">' + walletText + '</td>' +
-                            '<td>' + actionHtml + '</td>' +
-                            '</tr>';
-                    });
-                }
-            } catch (e) { console.error("خطأ في جلب بيانات المشرف:", e); }
+    // دالة مسح جميع الطلبات من الشاشة والسيرفر
+    function clearAllRequests() {
+        if (confirm('هل أنت متأكد من رغبتك في حذف وتصفير جميع الطلبات الحالية من لوحة التحكم؟')) {
+            fetch(clearRequestsUrl, { method: 'POST' })
+            .then(() => {
+                loadAdminRequests();
+            })
+            .catch(err => alert('تعذر تنظيف السجلات حالياً.'));
         }
+    }
 
-        async function processRequest(id, action) {
-            var bonusInput = document.getElementById('bonus_' + id);
-            var customBonus = bonusInput ? bonusInput.value : 0;
+    // تحديث وتحديث الشاشة تلقائياً كل 4 ثوانٍ لجلب الطلبات فور حدوثها
+    setInterval(loadAdminRequests, 4000);
+    
+    // تحميل الطلبات عند فتح الصفحة للمرة الأولى
+    window.onload = loadAdminRequests;
+</script>
 
-            try {
-                var res = await fetch('/api/admin/process-request', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id: id, action: action, customBonus: customBonus })
-                });
-                var data = await res.json();
-                alert(data.message);
-                fetchAdminData();
-            } catch (e) { alert("فشلت العملية"); }
-        }
-
-        async function triggerMagic() {
-            if (!confirm("هل أنت متأكد من رغبتك في توزيع أرباح بنسبة 15% على جميع الأعضاء النشطين الآن؟")) return;
-            try {
-                var res = await fetch('/api/admin/magic-button', { method: 'POST' });
-                var data = await res.json();
-                alert(data.message);
-                fetchAdminData();
-            } catch (e) { alert("فشلت عملية توزيع الأرباح"); }
-        }
-
-        fetchAdminData();
-        setInterval(fetchAdminData, 3000);
-    </script>
 </body>
 </html>

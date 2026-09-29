@@ -3,298 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف - مراقبة المعاملات</title>
+    <title>لوحة تحكم المشرف</title>
     <style>
-        :root {
-            --primary-color: #00c853;
-            --danger-color: #b71c1c;
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --text-muted: #aaaaaa;
-            --gold-color: #ffd600;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .admin-container {
-            width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        .admin-header {
-            text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #3a3a3a;
-            padding-bottom: 15px;
-        }
-
-        .admin-header h1 {
-            font-size: 24px;
-            color: var(--primary-color);
-            margin: 0 0 5px 0;
-        }
-
-        .admin-header p {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: #1b5e20;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        /* 🚀 تصميم زر توزيع الأرباح الجديد */
-        .btn-broadcast {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--gold-color);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(255, 214, 0, 0.3);
-        }
-
-        .btn-broadcast:hover {
-            background-color: #ffea00;
-        }
-
-        .requests-list {
-            margin-top: 20px;
-            min-height: 150px;
-        }
-
-        .request-card {
-            background: #2a2a2a;
-            border-left: 4px solid var(--primary-color);
-            padding: 18px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .request-card.withdraw-type {
-            border-left-color: var(--danger-color);
-        }
-
-        .request-card p {
-            margin: 8px 0;
-            font-size: 15px;
-        }
-
-        .wallet-container {
-            background: #111;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #3a3a3a;
-            margin: 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .wallet-text {
-            font-family: monospace;
-            font-size: 14px;
-            color: #ffb74d;
-            word-break: break-all;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-status {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-size: 14px;
-        }
-
+        :root { --primary-color: #00c853; --danger-color: #b71c1c; --bg-color: #121212; --card-bg: #1e1e1e; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; padding: 20px; display: flex; justify-content: center; }
+        .admin-container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 30px; border-radius: 16px; }
+        .status-badge { display: inline-block; background: #1b5e20; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; }
+        .btn-broadcast { width: 100%; padding: 15px; background-color: #ffd600; color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        .request-card { background: #2a2a2a; border-left: 4px solid var(--primary-color); padding: 18px; border-radius: 8px; margin-bottom: 15px; }
+        .wallet-container { background: #111; padding: 10px; border-radius: 6px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-status { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-approve { background-color: #2e7d32; color: white; }
-        .btn-approve:hover { background-color: #1b5e20; }
-        
         .btn-reject { background-color: #c62828; color: white; }
-        .btn-reject:hover { background-color: #b71c1c; }
-
-        .request-meta {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-top: 12px;
-            border-top: 1px solid #3a3a3a;
-            padding-top: 8px;
-        }
-
-        .btn-clear {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1px solid var(--danger-color);
-            color: var(--danger-color);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-        }
-
-        .btn-clear:hover {
-            background: var(--danger-color);
-            color: #fff;
-        }
-
-        .empty-message {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 40px 0;
-            font-style: italic;
-        }
-
-        .copy-btn {
-            background: #0088cc;
-            border: none;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .btn-clear { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="admin-container">
-    <div class="admin-header">
-        <h1>لوحة تتبع المعاملات الحية</h1>
-        <p>شاشة مراقبة طلبات الإيداع والسحب الخاصة بالمشرف</p>
-        <div id="liveStatus" class="status-badge">🟢 متصل بمستودع البيانات الثابتة</div>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2>لوحة تتبع المعاملات السحابية الحية</h2>
+        <div class="status-badge">🟢 متصل بالسيرفر السحابي المباشر</div>
     </div>
 
-    <!-- 🚀 الزر الجديد لبث الأرباح اليومية لجميع المشتركين -->
     <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
-
-    <div class="requests-list" id="requestsContainer">
-        <div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>
-    </div>
-
-    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة ومسح السجلات</button>
+    <div id="requestsContainer"></div>
+    <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف السجلات</button>
 </div>
 
 <script>
+    const baseUrl = 'https://vercel.app';
+
     function loadAdminRequests() {
-        const requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        const container = document.getElementById('requestsContainer');
-        container.innerHTML = ''; 
+        fetch(`${baseUrl}/requests`)
+        .then(res => res.json())
+        .then(requests => {
+            const container = document.getElementById('requestsContainer');
+            container.innerHTML = '';
+            if(requests.length === 0) { container.innerHTML = '<p style="text-align:center; color:#aaa;">لا توجد طلبات معلقة</p>'; return; }
 
-        if (requests.length === 0) {
-            container.innerHTML = '<div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>';
-            return;
-        }
-
-        [...requests].reverse().forEach(req => {
-            const isWithdraw = req.type && req.type.includes('سحب');
-            const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
-            const typeColor = isWithdraw ? '#ff5252' : '#00e676';
-            
-            let statusIcon = '⏳';
-            let statusColor = '#fff';
-            if (req.status === 'تم القبول') { statusIcon = '✅'; statusColor = '#00e676'; }
-            if (req.status === 'تم الرفض') { statusIcon = '❌'; statusColor = '#ff5252'; }
-
-            const cardHtml = `
-                <div class="${cardClass}">
-                    <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
-                    <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
-                    
-                    <div class="wallet-container">
-                        <div class="wallet-text">${req.wallet}</div>
-                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ!')">📋 نسخ</button>
+            [...requests].reverse().forEach(req => {
+                const typeColor = req.type.includes('سحب') ? '#ff5252' : '#00e676';
+                const cardHtml = `
+                    <div class="request-card" style="border-left-color: ${typeColor}">
+                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}">${req.type}</span></p>
+                        <p><strong>المبلغ:</strong> ${req.amount} USDT</p>
+                        <div class="wallet-container">
+                            <span style="font-size:13px; color:#ffb74d;">${req.wallet}</span>
+                            <button style="padding:4px 8px; background:#444; color:#fff; border:none; cursor:pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ')">نسخ</button>
+                        </div>
+                        <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
+                            <button class="btn-status btn-approve" onclick="updateStatus(${req.id}, 'تم القبول')">موافق 👍</button>
+                            <button class="btn-status btn-reject" onclick="updateStatus(${req.id}, 'تم الرفض')">رفض 👎</button>
+                        </div>
+                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة: <strong>${req.status}</strong> | التوقيت: ${req.date}</p>
                     </div>
-
-                    <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
-                        <button class="btn-status btn-approve" onclick="updateStatus(${req.id}, 'تم القبول', '${req.type}', ${req.amount})">موافق 👍</button>
-                        <button class="btn-status btn-reject" onclick="updateStatus(${req.id}, 'تم الرفض', '${req.type}', ${req.amount})">رفض 👎</button>
-                    </div>
-
-                    <div class="request-meta">
-                        <span>حالة الطلب: <span style="color: ${statusColor}; font-weight: bold;">${statusIcon} ${req.status}</span></span>
-                        <span>توقيت الإرسال: ${req.date || 'غير محدد'}</span>
-                    </div>
-                </div>
-            `;
-            container.innerHTML += cardHtml;
+                `;
+                container.innerHTML += cardHtml;
+            });
         });
     }
 
-    function updateStatus(id, newStatus, type, amount) {
-        let requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        requests = requests.map(req => {
-            if (req.id === id) { 
-                req.status = newStatus;
-            }
-            return req;
-        });
-        localStorage.setItem('admin_orders', JSON.stringify(requests));
-
-        // تحديث الحساب المالي للمستودع المحلي عند الموافقة
-        if (newStatus === 'تم القبول') {
-            let userBalance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
-            const numAmount = parseFloat(amount) || 0;
-
-            if (type === 'إيداع') {
-                userBalance.capital += numAmount;
-            } else if (type === 'سحب كلّي') {
-                userBalance.capital = 0;
-            } else if (type === 'سحب اليوم') {
-                userBalance.todayProfit -= numAmount;
-            } else if (type === 'سحب أرباح الدعوة') {
-                userBalance.inviteProfit -= numAmount;
-            }
-            localStorage.setItem('user_balance', JSON.stringify(userBalance));
-        }
-
-        loadAdminRequests();
+    function updateStatus(id, newStatus) {
+        fetch(`${baseUrl}/update-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, newStatus: newStatus })
+        }).then(() => loadAdminRequests());
     }
 
-    // 🚀 الدالة الجديدة الذكية لحساب وبث الأرباح بنسبة 15%
     function broadcastTodayProfit() {
-        let userBalance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
-        
-        if (userBalance.capital <= 0) {
-            
+        fetch(`${baseUrl}/broadcast`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => { if(data.success) { alert('تم بث الأرباح 15% بنجاح سحابي!'); } else { alert('رأس المال فارغ'); } });
+    }
+
+    function clearAllRequests() {
+        if(confirm('تأكيد مسح السجلات؟')) fetch(`${baseUrl}/clear`, { method: 'POST' }).then(() => loadAdminRequests());
+    }
+
+    setInterval(loadAdminRequests, 2500);
+    window.onload = loadAdminRequests;
+</script>
+</body>
+</html>

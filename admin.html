@@ -103,7 +103,6 @@
             font-size: 14px;
             color: #ffb74d;
             word-break: break-all;
-            user-select: all;
         }
 
         .action-buttons {
@@ -175,7 +174,6 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .copy-btn:hover { background: #0077b3; }
     </style>
 </head>
 <body>
@@ -187,12 +185,10 @@
         <div id="liveStatus" class="status-badge">🟢 متصل بمستودع البيانات الثابتة</div>
     </div>
 
-    <!-- قائمة عرض الطلبات المستلمة -->
     <div class="requests-list" id="requestsContainer">
         <div class="empty-message">شاشات المراقبة نظيفة، لا توجد طلبات معلقة حالياً</div>
     </div>
 
-    <!-- زر تنظيف اللوحة -->
     <button class="btn-clear" onclick="clearAllRequests()">🗑️ تنظيف شاشة المراقبة ومسح السجلات</button>
 </div>
 
@@ -200,7 +196,6 @@
     function loadAdminRequests() {
         const requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
         const container = document.getElementById('requestsContainer');
-        
         container.innerHTML = ''; 
 
         if (requests.length === 0) {
@@ -208,13 +203,11 @@
             return;
         }
 
-        // عرض الطلبات من الأحدث للأقدم
         [...requests].reverse().forEach(req => {
             const isWithdraw = req.type && req.type.includes('سحب');
             const cardClass = isWithdraw ? 'request-card withdraw-type' : 'request-card';
             const typeColor = isWithdraw ? '#ff5252' : '#00e676';
             
-            // تحديد أيقونة ولون الحالة بناءً على قرار المشرف
             let statusIcon = '⏳';
             let statusColor = '#fff';
             if (req.status === 'تم القبول') { statusIcon = '✅'; statusColor = '#00e676'; }
@@ -225,16 +218,14 @@
                     <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
                     <p><strong>المبلغ المطلوب:</strong> <span style="font-size: 18px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
                     
-                    <!-- 📋 مستطيل عرض المحفظة المطور مع زر النسخ السريع -->
                     <div class="wallet-container">
-                        <div class="wallet-text" id="wallet_${req.id}">${req.wallet}</div>
-                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم نسخ عنوان المحفظة بنجاح!')">📋 نسخ</button>
+                        <div class="wallet-text">${req.wallet}</div>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ!')">📋 نسخ</button>
                     </div>
 
-                    <!-- 🔘 أزرار التحكم بالموافقة والرفض المضافة حديثاً -->
-                    <div class="action-buttons" id="actions_${req.id}" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
-                        <button class="btn-status btn-approve" onclick="updateStatus(${req.id}, 'تم القبول')">موافق 👍</button>
-                        <button class="btn-status btn-reject" onclick="updateStatus(${req.id}, 'تم الرفض')">رفض 👎</button>
+                    <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
+                        <button class="btn-status btn-approve" onclick="updateStatus(${req.id}, 'تم القبول', '${req.type}', ${req.amount})">موافق 👍</button>
+                        <button class="btn-status btn-reject" onclick="updateStatus(${req.id}, 'تم الرفض', '${req.type}', ${req.amount})">رفض 👎</button>
                     </div>
 
                     <div class="request-meta">
@@ -247,30 +238,45 @@
         });
     }
 
-    // دالة لتحديث حالة الطلب عند الضغط على موافق أو رفض
-    function updateStatus(id, newStatus) {
+    function updateStatus(id, newStatus, type, amount) {
         let requests = JSON.parse(localStorage.getItem('admin_orders')) || [];
         requests = requests.map(req => {
-            if (req.id === id || (req.date && !req.id)) { 
+            if (req.id === id) { 
                 req.status = newStatus;
             }
             return req;
         });
         localStorage.setItem('admin_orders', JSON.stringify(requests));
-        loadAdminRequests(); // تحديث فوري للشاشة
+
+        // 🔄 تحديث الحساب المالي للمستخدم محلياً عند الضغط على موافق
+        if (newStatus === 'تم القبول') {
+            let userBalance = JSON.parse(localStorage.getItem('user_balance')) || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+            const numAmount = parseFloat(amount) || 0;
+
+            if (type === 'إيداع') {
+                userBalance.capital += numAmount;
+            } else if (type === 'سحب كلّي') {
+                userBalance.capital = 0;
+            } else if (type === 'سحب اليوم') {
+                userBalance.todayProfit -= numAmount;
+            } else if (type === 'سحب أرباح الدعوة') {
+                userBalance.inviteProfit -= numAmount;
+            }
+            localStorage.setItem('user_balance', JSON.stringify(userBalance));
+        }
+
+        loadAdminRequests();
     }
 
     function clearAllRequests() {
-        if (confirm('هل أنت متأكد من رغبتك في حذف وتصفير جميع الطلبات الحالية من لوحة التحكم؟')) {
+        if (confirm('هل أنت متأكد من الحذف؟')) {
             localStorage.removeItem('admin_orders');
             loadAdminRequests();
         }
     }
 
-    // تحديث اللوحة تلقائياً كل ثانيتين
     setInterval(loadAdminRequests, 2000);
     window.onload = loadAdminRequests;
 </script>
-
 </body>
 </html>

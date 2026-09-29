@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف - إدارة الطلبات</title>
+    <title>لوحة تحكم المشرف - إدارة المنصة</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 20px; direction: rtl; }
         .admin-container { max-width: 1000px; margin: 0 auto; }
-        h1 { color: #2196f3; font-size: 24px; border-bottom: 2px solid #1e2d4a; padding-bottom: 10px; }
-        .order-table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; overflow: hidden; }
+        h1, h2 { color: #2196f3; border-bottom: 2px solid #1e2d4a; padding-bottom: 10px; margin-top: 30px; }
+        .order-table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; overflow: hidden; }
         th, td { padding: 15px; text-align: right; border-bottom: 1px solid #1e2d4a; }
         th { background-color: #1e2d4a; color: #90a4ae; font-size: 14px; }
         td { font-size: 15px; }
@@ -20,72 +20,104 @@
         .badge-deposit { background-color: #f57c00; color: white; }
         .badge-withdraw { background-color: #d32f2f; color: white; }
         .badge-invite { background-color: #7b1fa2; color: white; }
-        .no-orders { text-align: center; color: #90a4ae; padding: 30px; font-style: italic; }
+        .no-data { text-align: center; color: #90a4ae; padding: 25px; font-style: italic; }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
         <h1>🖥️ لوحة تحكم المشرف الفورية</h1>
-        <p style="color: #90a4ae;">تظهر هنا طلبات الإيداع، السحب، ومكافآت الدعوة تلقائياً للتحكم بها:</p>
-
+        
+        <h2>📥 1. طلبات الأعضاء الواردة (بانتظار المراجعة)</h2>
         <table class="order-table">
             <thead>
                 <tr>
                     <th>اسم المستخدم</th>
                     <th>نوع الطلب</th>
                     <th>المبلغ / التفاصيل</th>
-                    <th>عنوان المحفظة / الصديق</th>
-                    <th>الإجراءات والقرارات</th>
+                    <th>المحفظة / الصديق المدعو</th>
+                    <th>اتخاذ قرار رسمي</th>
                 </tr>
             </thead>
             <tbody id="ordersTableBody">
-                <!-- يتم تحميل الطلبات هنا تلقائياً بواسطة الجافاسكربت -->
+                <!-- تحميل الطلبات هنا تلقائياً -->
+            </tbody>
+        </table>
+
+        <h2>📊 2. مراقبة وإدارة أرصدة وأرباح الأعضاء الحالية</h2>
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>اسم المستخدم</th>
+                    <th>إجمالي رأس المال</th>
+                    <th>أرباح اليوم</th>
+                    <th>أرباح المكافآت 🎁</th>
+                    <th>عدد أعضاء الفريق</th>
+                </tr>
+            </thead>
+            <tbody id="profitsTableBody">
+                <!-- تحميل الأرصدة المحدثة هنا تلقائياً -->
             </tbody>
         </table>
     </div>
 
 <script>
-    // دالة لجلب الطلبات المعلقة من السيرفر وعرضها فوراً
-    function fetchLiveOrders() {
+    // دالة الاتصال بالسيرفر وجلب كافة البيانات وتحديث الجداول تلقائياً كل ثانيتين
+    function refreshLiveAdminDashboard() {
+        // 1. جلب طلبات السحب والإيداع والدعوة المعلقة
         fetch('/api/admin/orders')
         .then(res => res.json())
         .then(orders => {
             const tbody = document.getElementById('ordersTableBody');
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="no-orders">☕ لا توجد طلبات جديدة معلقة حالياً... الجدول نظيف!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="no-data">☕ لا توجد طلبات جديدة معلقة حالياً... الجدول نظيف!</td></tr>`;
                 return;
             }
-
-            tbody.innerHTML = ''; // تفريغ الجدول لإعادة البناء
+            tbody.innerHTML = '';
             orders.forEach(order => {
-                let badgeClass = 'badge-deposit';
-                if(order.type === 'سحب') badgeClass = 'badge-withdraw';
-                if(order.type === 'مكافأة دعوة') badgeClass = 'badge-invite';
+                let badgeClass = order.type === 'سحب' ? 'badge-withdraw' : (order.type === 'مكافأة دعوة' ? 'badge-invite' : 'badge-deposit');
+                const infoAmount = order.amount ? `${order.amount} USDT` : 'طلب مكافأة';
+                const infoAddress = order.wallet ? order.wallet : `اسم الصديق: ${order.friendName}`;
 
-                const details = order.amount ? `${order.amount} USDT` : 'طلب إضافة عضو';
-                const extraInfo = order.wallet ? order.wallet : `الصديق: ${order.friendName}`;
-
-                const row = `
+                tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight: bold; color: #4fc3f7;">${order.username}</td>
+                        <td style="color:#4fc3f7; font-weight:bold;">${order.username}</td>
                         <td><span class="badge ${badgeClass}">${order.type}</span></td>
-                        <td style="color: #00e676; font-weight: bold;">${details}</td>
-                        <td style="font-family: monospace; color: #ffb74d;">${extraInfo}</td>
+                        <td style="color:#00e676; font-weight:bold;">${infoAmount}</td>
+                        <td style="font-family:monospace; color:#ffb74d;">${infoAddress}</td>
                         <td>
-                            <button class="btn btn-success" onclick="takeAction('${order.id}', 'accept')">✅ قبول</button>
-                            <button class="btn btn-danger" onclick="takeAction('${order.id}', 'reject')">❌ رفض</button>
+                            <button class="btn btn-success" onclick="executeAdminAction('${order.id}', 'accept')">✅ قبول الطلب</button>
+                            <button class="btn btn-danger" onclick="executeAdminAction('${order.id}', 'reject')">❌ رفض</button>
                         </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+                    </tr>`;
             });
-        })
-        .catch(err => console.log('في انتظار اتصال السيرفر...'));
+        }).catch(err => console.log('بانتظار تشغيل السيرفر...'));
+
+        // 2. جلب الأرصدة الحالية والأرباح لمراقبتها
+        fetch('/api/admin/users-profits')
+        .then(res => res.json())
+        .then(users => {
+            const tbody = document.getElementById('profitsTableBody');
+            tbody.innerHTML = '';
+            if (Object.keys(users).length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="no-data">📊 لا توجد بيانات أرصدة أو أعضاء نشطين بعد في المنصة.</td></tr>`;
+                return;
+            }
+            for (let username in users) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold; color:#fff;">${username}</td>
+                        <td style="color:#ffb74d; font-weight:bold;">USDT ${(users[username].capital || 0).toFixed(2)}</td>
+                        <td style="color:#00e676; font-weight:bold;">USDT ${(users[username].todayProfit || 0).toFixed(2)}</td>
+                        <td style="color:#ba68c8; font-weight:bold;">USDT ${(users[username].inviteProfit || 0).toFixed(2)}</td>
+                        <td>${users[username].teamCount || 0} أعضاء نشطين</td>
+                    </tr>`;
+            }
+        }).catch(err => console.log('مزامنة...'));
     }
 
-    // إرسال قرار المشرف (قبول/رفض) إلى السيرفر ليتم تحديث رصيد المستخدم فوراً
-    function takeAction(orderId, action) {
+    // دالة إرسال خيار القبول أو الرفض للسيرفر
+    function executeAdminAction(orderId, action) {
         fetch('/api/admin/action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -94,16 +126,15 @@
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                alert(action === 'accept' ? '🎯 تم قبول الطلب وتحديث رصيد الحساب!' : '❌ تم رفض الطلب وإلغاؤه.');
-                fetchLiveOrders(); // تحديث الجدول فوراً
+                refreshLiveAdminDashboard(); // تحديث فوري للشاشة عقب اتخاذ القرار
             }
         })
-        .catch(err => alert('حدث خطأ أثناء تنفيذ الإجراء.'));
+        .catch(err => alert('حدث خطأ أثناء معالجة الطلب برمجياً.'));
     }
 
-    // تشغيل الفحص الدوري كل ثانيتين للتحديث الفوري والحيوي
-    setInterval(fetchLiveOrders, 2000);
-    window.onload = fetchLiveOrders;
+    // تفعيل التحديث التلقائي المستمر كل ثانيتين بدون تجميد
+    setInterval(refreshLiveAdminDashboard, 2000);
+    window.onload = refreshLiveAdminDashboard;
 </script>
 </body>
 </html>

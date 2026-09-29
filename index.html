@@ -21,12 +21,12 @@
 </head>
 <body>
 
-    <!-- 👤 قسم اسم المستخدم الثابت بعد الحفظ -->
+    <!-- 👤 قسم اسم العضو (مطور مع ميزة القفل والتثبيت الدائم بعد الحفظ) -->
     <div class="section-card">
         <div class="section-title">👤 اسم المستخدم الحالي:</div>
         <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">لاعب حقيقي</div>
         <div id="usernameForm">
-            <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا للتغيير...">
+            <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا للتغيير والتبثيت...">
             <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت اسم العضو</button>
         </div>
     </div>
@@ -75,27 +75,32 @@
     <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
 
 <script>
-    const dbUrl = 'https://trading-bot-6f5df-default-rtdb.firebaseio.com';
+    // 🌐 مسار شبكة الاتصال المباشرة السريعة والمستقرة
+    const backupServerUrl = 'https://vercel.app';
 
     function saveUsername() {
         const name = document.getElementById('usernameInput').value.trim();
-        if(!name) return;
+        if(!name) { alert('الرجاء كتابة اسم العضو أولاً.'); return; }
+        
         localStorage.setItem('saved_user_name', name);
         document.getElementById('currentUsernameText').innerText = name;
-        document.getElementById('usernameForm').style.display = 'none'; // 🔒 إخفاء خانة التعديل والزر بعد الحفظ
-        alert('تم التثبيت النهائي للاسم ولن يتغير!');
+        document.getElementById('usernameForm').style.display = 'none'; // 🔒 قفل وإخفاء خانة الإدخال والزر نهائياً
+        alert('🎯 تم التثبيت النهائي للاسم ولا يمكن تعديله بعد الآن!');
     }
 
     function loadSavedUsername() {
         const savedName = localStorage.getItem('saved_user_name');
         if(savedName) {
             document.getElementById('currentUsernameText').innerText = savedName;
-            document.getElementById('usernameForm').style.display = 'none'; // 🔒 منع التغيير بعد الحفظ
+            document.getElementById('usernameForm').style.display = 'none'; // 🔒 إبقاء الخانة مخفية ومنع التغيير عند العودة للموقع
+        } else {
+            document.getElementById('currentUsernameText').innerText = 'لاعب حقيقي';
+            document.getElementById('usernameForm').style.display = 'block';
         }
     }
 
     function updateLiveBalances() {
-        fetch(`${dbUrl}/balances.json`)
+        fetch(`${backupServerUrl}/balances`)
         .then(res => res.json())
         .then(balance => {
             if(balance) {
@@ -103,7 +108,7 @@
                 document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(balance.todayProfit || 0).toFixed(2)}`;
                 document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(balance.inviteProfit || 0).toFixed(2)}`;
             }
-        });
+        }).catch(err => console.log('جاري المزامنة المالية...'));
     }
 
     function handleTransaction(actionType, amountId, walletId) {
@@ -111,43 +116,34 @@
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
         const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
 
-        if(!amount || !wallet) return alert('يرجى ملء الحقول');
+        if(!amount || !wallet) { alert('يرجى تعبئة الحقول الفارغة أولاً.'); return; }
 
-        const newRequest = {
-            amount: parseFloat(amount) || 0,
-            wallet: wallet,
-            username: currentUser, // إرسال اسم العضو منفصلاً بوضوح للمشرف
-            type: actionType,
-            status: 'معلق',
-            date: new Date().toLocaleString('ar-EG')
-        };
-
-        fetch(`${dbUrl}/orders.json`, {
+        fetch(`${backupServerUrl}/deposit`, {
             method: 'POST',
-            body: JSON.stringify(newRequest)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: amount, wallet: wallet, type: `${actionType} (بواسطة العضو: ${currentUser})` })
         })
+        .then(res => res.json())
         .then(() => {
-            alert(`🎯 تم إرسال طلب ${actionType} للمشرف بنجاح!`);
+            alert(`🎯 تم بنجاح إرسال طلب المعاملة للمشرف!`);
             if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
-        });
+        }).catch(err => alert('فشل الإرسال، تأكد من الاتصال بالشبكة.'));
     }
 
     function sendInviteRequest() {
         const memberName = document.getElementById('inviteMemberName').value.trim();
         const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
-        if(!memberName) return;
+        if(!memberName) return alert('الرجاء كتابة اسم العضو.');
 
-        const newRequest = {
-            amount: 0,
-            wallet: `العضو المدعو: ${memberName}`,
-            username: currentUser,
-            type: 'مكافأة دعوة',
-            status: 'معلق',
-            date: new Date().toLocaleString('ar-EG')
-        };
-
-        fetch(`${dbUrl}/orders.json`, { method: 'POST', body: JSON.stringify(newRequest) })
-        .then(() => { alert('تم تقديم طلب المكافأة للمشرف!'); document.getElementById('inviteMemberName').value = ''; });
+        fetch(`${backupServerUrl}/deposit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: 0, wallet: `العضو المدعو: ${memberName}`, type: `مكافأة دعوة (من: ${currentUser})` })
+        })
+        .then(() => { 
+            alert('📢 تم تقديم طلب مكافأة الدعوة للمشرف بنجاح!'); 
+            document.getElementById('inviteMemberName').value = ''; 
+        });
     }
 
     setInterval(updateLiveBalances, 1500);

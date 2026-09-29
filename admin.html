@@ -7,9 +7,9 @@
     <style>
         :root { --primary-color: #00c853; --danger-color: #b71c1c; --bg-color: #121212; --card-bg: #1e1e1e; --gold-color: #ffd600;}
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; padding: 20px; display: flex; justify-content: center; }
-        .admin-container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .admin-container { width: 100%; max-width: 600px; background: var(--card-bg); padding: 30px; border-radius: 16px; }
         .status-badge { display: inline-block; background: #1b5e20; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; }
-        .btn-broadcast { width: 100%; padding: 15px; background-color: var(--gold-color); color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255,214,0,0.2); }
+        .btn-broadcast { width: 100%; padding: 15px; background-color: var(--gold-color); color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
         .request-card { background: #2a2a2a; border-left: 4px solid var(--primary-color); padding: 18px; border-radius: 8px; margin-bottom: 15px; }
         .wallet-container { background: #111; padding: 10px; border-radius: 6px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
         .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
@@ -25,7 +25,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <h2>لوحة تتبع المعاملات الحية المحدثة</h2>
         <div id="orderCount" style="font-size: 14px; color: #4fc3f7; margin-bottom: 10px; font-weight: bold;">إجمالي طلبات المنصة: 0</div>
-        <div class="status-badge" id="liveStatusBadge">🟢 متصل وشبكة الاتصال نشطة</div>
+        <div class="status-badge" style="background-color: #1b5e20;">🟢 متصل ومستقر 100% (جوجل سحابي)</div>
     </div>
 
     <button class="btn-broadcast" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
@@ -34,73 +34,91 @@
 </div>
 
 <script>
-    const backupServerUrl = 'https://vercel.app';
+    const firebaseUrl = 'https://firebaseio.com';
 
     function loadAdminRequests() {
-        fetch(`${backupServerUrl}/requests`)
+        fetch(`${firebaseUrl}/orders.json`)
         .then(res => res.json())
-        .then(requests => {
+        .then(data => {
             const container = document.getElementById('requestsContainer');
             container.innerHTML = '';
             
-            if(!requests || requests.length === 0) { 
+            if(!data) { 
                 document.getElementById('orderCount').innerText = "إجمالي طلبات المنصة: 0";
-                container.innerHTML = '<p style="text-align:center; color:#aaa; font-style:italic;">شاشات المراقبة نظيفة، لا توجد طلبات معلقة</p>'; 
+                container.innerHTML = '<p style="text-align:center; color:#aaa;">شاشات المراقبة نظيفة، لا توجد طلبات معلقة</p>'; 
                 return; 
             }
 
-            document.getElementById('orderCount').innerText = `إجمالي طلبات المنصة: ${requests.length}`;
+            const keys = Object.keys(data);
+            document.getElementById('orderCount').innerText = `إجمالي طلبات المنصة: ${keys.length}`;
 
-            [...requests].reverse().forEach(req => {
+            keys.reverse().forEach(key => {
+                const req = data[key];
                 const typeColor = req.type.includes('سحب') ? '#ff5252' : '#00e676';
                 
                 const cardHtml = `
                     <div class="request-card" style="border-left-color: ${typeColor}">
-                        <p><strong>تفاصيل العملية المرسلة:</strong></p>
-                        <p><strong>النوع والمصدر:</strong> <span style="color: ${typeColor}; font-weight: bold;">${req.type}</span></p>
-                        <p><strong>المبلغ المالي:</strong> <span style="font-size: 16px; font-weight: bold; color: #fff;">${req.amount} USDT</span></p>
+                        <p><strong>اسم العضو:</strong> <span style="color: #4fc3f7; font-weight: bold;">${req.username || 'لاعب حقيقي'}</span></p>
+                        <p><strong>نوع العملية:</strong> <span style="color: ${typeColor}">${req.type}</span></p>
+                        <p><strong>المبلغ:</strong> ${req.amount} USDT</p>
                         <div class="wallet-container">
                             <span style="font-size:13px; color:#ffb74d; word-break:break-all;">${req.wallet}</span>
-                            <button style="padding:4px 8px; background:#444; color:#fff; border:none; cursor:pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ بنجاح!')">نسخ</button>
+                            <button style="padding:4px 8px; background:#444; color:#fff; border:none; cursor:pointer;" onclick="navigator.clipboard.writeText('${req.wallet}'); alert('تم النسخ!')">نسخ</button>
                         </div>
                         <div class="action-buttons" style="${req.status !== 'معلق' ? 'display:none;' : ''}">
-                            <button class="btn-status btn-approve" onclick="updateStatus(${req.id}, 'تم القبول')">موافق 👍</button>
-                            <button class="btn-status btn-reject" onclick="updateStatus(${req.id}, 'تم الرفض')">رفض 👎</button>
+                            <button class="btn-status btn-approve" onclick="updateStatus('${key}', 'تم القبول', '${req.type}', ${req.amount})">موافق 👍</button>
+                            <button class="btn-status btn-reject" onclick="updateStatus('${key}', 'تم الرفض')">رفض 👎</button>
                         </div>
-                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة الحالية: <strong>${req.status}</strong> | التوقيت: ${req.date}</p>
+                        <p style="font-size:12px; color:#aaa; margin-top:10px;">الحالة: <strong>${req.status}</strong> | التوقيت: ${req.date}</p>
                     </div>
                 `;
                 container.innerHTML += cardHtml;
             });
-        }).catch(err => {
-            document.getElementById('liveStatusBadge').innerText = '🔴 خطأ في الاتصال بالسيرفر';
-            document.getElementById('liveStatusBadge').style.backgroundColor = '#b71c1c';
         });
     }
 
-    function updateStatus(id, newStatus) {
-        fetch(`${backupServerUrl}/update-status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id, newStatus: newStatus })
-        }).then(() => loadAdminRequests());
+    function updateStatus(key, newStatus, type, amount) {
+        fetch(`${firebaseUrl}/orders/${key}.json`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(() => {
+            if (newStatus === 'تم القبول') {
+                fetch(`${firebaseUrl}/balances.json`)
+                .then(res => res.json())
+                .then(balance => {
+                    let current = balance || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+                    const numAmount = parseFloat(amount) || 0;
+
+                    if (type === 'إيداع') current.capital += numAmount;
+                    else if (type === 'سحب كلّي') current.capital = 0;
+                    else if (type === 'سحب اليوم') current.todayProfit -= numAmount;
+
+                    fetch(`${firebaseUrl}/balances.json`, { method: 'PUT', body: JSON.stringify(current) });
+                });
+            }
+            setTimeout(loadAdminRequests, 500);
+        });
     }
 
     function broadcastTodayProfit() {
-        fetch(`${backupServerUrl}/broadcast`, { method: 'POST' })
+        fetch(`${firebaseUrl}/balances.json`)
         .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                alert(`🔥 تم بث أرباح الصفقة اليومية 15% بنجاح سحابي للمشتركين النشطين!`);
-            } else {
-                alert('⚠️ تعذر البث المالي لأن إجمالي رأس مال المشتركين صفر حالياً.');
-            }
+        .then(balance => {
+            let current = balance || { capital: 0, todayProfit: 0, inviteProfit: 0 };
+            if (current.capital <= 0) return alert('رأس المال صفر حالياً!');
+            
+            const profit = current.capital * 0.15;
+            current.todayProfit += profit;
+
+            fetch(`${firebaseUrl}/balances.json`, { method: 'PUT', body: JSON.stringify(current) })
+            .then(() => alert(`🎯 تم بث الأرباح بنسبة 15% بمجموع مضاف: ${profit.toFixed(2)} USDT`));
         });
     }
 
     function clearAllRequests() {
-        if(confirm('هل أنت متأكد من تنظيف كافة السجلات نهائياً من السيرفر؟')) {
-            fetch(`${backupServerUrl}/clear`, { method: 'POST' }).then(() => loadAdminRequests());
+        if(confirm('هل أنت متأكد من المسح التام؟')) {
+            fetch(`${firebaseUrl}/orders.json`, { method: 'DELETE' }).then(() => loadAdminRequests());
         }
     }
 

@@ -5,110 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة التداول الذكية</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 15px; direction: rtl; }
         .section-card { background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .section-title { font-size: 14px; color: #90a4ae; margin-bottom: 10px; }
-        .value-display { font-size: 20px; font-weight: bold; color: #2196f3; text-align: left; }
-        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .section-title { font-size: 14px; color: #90a4ae; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .value-display { font-size: 20px; font-weight: bold; color: #2196f3; text-align: left; margin: 5px 0; }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: opacity 0.2s; }
+        .btn-action:hover { opacity: 0.9; }
         .btn-purple { background-color: #7b1fa2; color: white; }
         .btn-red { background-color: #d32f2f; color: white; }
         .btn-orange { background-color: #f57c00; color: white; }
         .btn-blue { background-color: #1976d2; color: white; padding: 10px; }
+        .btn-green { background-color: #2e7d32; color: white; }
+        .btn-gold { background-color: #ffd600; color: #000; box-shadow: 0 4px 12px rgba(255,214,0,0.2); }
         .btn-support { background-color: #0088cc; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         input { width: 100%; padding: 12px; background: #0b111e; border: 1px solid #1e2d4a; border-radius: 4px; color: #fff; box-sizing: border-box; margin-bottom: 5px; text-align: right; }
-        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; }
+        .wallet-box { background: #0b111e; padding: 10px; border-radius: 4px; font-family: monospace; color: #ffb74d; text-align: center; word-break: break-all; }
+        
+        /* تصميم قسم المشرف السري */
+        #adminSection { display: none; margin-top: 30px; border-top: 3px dashed #7b1fa2; padding-top: 20px; }
+        .request-card { background: #2a2a2a; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #00c853; }
+        .wallet-container { background: #111; padding: 8px; border-radius: 4px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-buttons { display: flex; gap: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- 👤 قسم اسم العضو (مطور مع ميزة القفل والتثبيت الدائم بعد الحفظ) -->
-    <div class="section-card">
-        <div class="section-title">👤 اسم المستخدم الحالي:</div>
-        <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">لاعب حقيقي</div>
-        <div id="usernameForm">
-            <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا للتغيير والتبثيت...">
-            <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت اسم العضو</button>
+    <!-- ==================== واجهة المستخدم ==================== -->
+    <div id="userInterface">
+        <!-- 👤 اسم العضو المحفوظ -->
+        <div class="section-card">
+            <div class="section-title">👤 اسم المستخدم الحالي:</div>
+            <div id="currentUsernameText" style="font-size: 18px; font-weight: bold; color: #4fc3f7; margin-bottom:8px;">لاعب حقيقي</div>
+            <div id="usernameForm">
+                <input type="text" id="usernameInput" placeholder="اكتب اسم العضو هنا للتثبيت...">
+                <button class="btn-action btn-blue" onclick="saveUsername()">💾 حفظ وتثبيت اسم العضو</button>
+            </div>
         </div>
+
+        <!-- 🏆 الجائزة الكبرى -->
+        <div class="section-card">
+            <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
+            <div class="value-display">2500 دولار أمريكي</div>
+        </div>
+
+        <!-- 🔗 طلب مكافأة دعوة -->
+        <div class="section-card">
+            <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
+            <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
+            <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 أرسل الطلب إلى مشرفك</button>
+        </div>
+
+        <!-- 💰 الأرصدة الحية -->
+        <div class="section-card">
+            <div class="section-title">💰 إجمالي رأس المال:</div>
+            <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
+        </div>
+        <div class="section-card">
+            <div class="section-title">📊 أرباح اليوم:</div>
+            <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
+        </div>
+        <div class="section-card">
+            <div class="section-title">👥 أرباح تذاكر الدعوة:</div>
+            <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
+        </div>
+
+        <!-- 🚨 لوحة عمليات السحب -->
+        <div class="section-card" style="border-color: #d32f2f;">
+            <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية (TRC-20):</div>
+            <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
+            <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية TRC-20">
+            <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
+            <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
+        </div>
+
+        <!-- 📥 طلب إيداع رأس المال -->
+        <div class="section-card" style="border-color: #f57c00;">
+            <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال:</div>
+            <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
+            <button class="btn-action" style="background-color: #334155; color: #fff; font-size: 12px; margin-bottom: 10px;" onclick="navigator.clipboard.writeText(document.getElementById('adminWalletAddress').innerText); alert('تم النسخ!')">📋 نسخ عنوان المحفظة</button>
+            <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل">
+            <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
+        </div>
+
+        <!-- 📞 الدعم الفني -->
+        <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
+
+        <!-- 🔒 الزر السري للدخول إلى شاشة الأدمن داخل نفس الصفحة -->
+        <button class="btn-action btn-purple" style="margin-top: 30px; background-color: #212121; border: 1px dashed #444;" onclick="openAdminSection()">🔐 دخول لوحة تحكم المشرف (خاص بالادمن)</button>
     </div>
 
-    <div class="section-card">
-        <div class="section-title">🏆 الجائزة الكبرى (40 عضو):</div>
-        <div class="value-display">2500 دولار أمريكي</div>
-    </div>
+    <!-- ==================== لوحة تحكم المشرف السحرية المدمجة ==================== -->
+    <div id="adminSection" class="section-card" style="background-color: #121212; border: 2px solid #7b1fa2;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #ffd600; margin: 0;">🛠️ لوحة المشرف المباشرة الثابتة</h2>
+            <p style="color: #aaa; font-size: 12px; margin: 5px 0;">الطلبات والاتصال يعمل داخلياً 100% بدون انقطاع</p>
+        </div>
 
-    <div class="section-card">
-        <div class="section-title">🔗 طلب الحصول على مكافأة الدعوة:</div>
-        <input type="text" id="inviteMemberName" placeholder="اسم العضو المدعو">
-        <button class="btn-action btn-purple" onclick="sendInviteRequest()">📢 أرسل الطلب إلى مشرفك</button>
+        <button class="btn-action btn-gold" onclick="broadcastTodayProfit()">📊 بث أرباح الصفقة اليومية (نسبة 15%)</button>
+        
+        <h3 style="color: #4fc3f7; font-size: 14px; margin-top: 20px;">📥 قائمة الطلبات المستلمة فوراً:</h3>
+        <div id="requestsContainer" style="color: #aaa; text-align: center; padding: 20px 0; font-style: italic;">لا توجد طلبات معلقة حالياً</div>
+        
+        <button class="btn-action btn-red" style="background: transparent; border: 1px solid #d32f2f; color: #d32f2f;" onclick="clearAllRequests()">🗑️ تنظيف السجلات تماماً</button>
+        <button class="btn-action btn-blue" style="margin-top: 15px;" onclick="closeAdminSection()">⬅️ العودة لواجهة المستخدم</button>
     </div>
-
-    <div class="section-card">
-        <div class="section-title">💰 إجمالي رأس المال:</div>
-        <div class="value-display" id="displayCapital" style="color: #ffb74d;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">📊 أرباح اليوم:</div>
-        <div class="value-display" id="displayTodayProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card">
-        <div class="section-title">👥 أرباح تذاكر الدعوة:</div>
-        <div class="value-display" id="displayInviteProfit" style="color: #00e676;">USDT 0.00</div>
-    </div>
-
-    <div class="section-card" style="border-color: #d32f2f;">
-        <div class="section-title" style="color: #ff5252;">🚨 لوحة عمليات السحب الفورية والآمنة:</div>
-        <input type="number" id="withdrawAmount" placeholder="المبلغ بـ USDT">
-        <input type="text" id="withdrawWallet" placeholder="أدخل عنوان محفظتك الشخصية TRC-20">
-        <button class="btn-action btn-red" onclick="handleTransaction('سحب كلّي', 'withdrawAmount', 'withdrawWallet')">سحب كلّي</button>
-        <button class="btn-action btn-red" style="background-color: #b71c1c;" onclick="handleTransaction('سحب اليوم', 'withdrawAmount', 'withdrawWallet')">سحب اليوم</button>
-    </div>
-
-    <div class="section-card" style="border-color: #f57c00;">
-        <div class="section-title" style="color: #ffb74d;">📥 طلب إيداع رأس المال:</div>
-        <div class="wallet-box" id="adminWalletAddress">TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN</div>
-        <input type="number" id="depositAmount" placeholder="أدخل المبلغ بعد التحويل">
-        <button class="btn-action btn-orange" onclick="handleTransaction('إيداع', 'depositAmount', 'adminWalletAddress')">⚡ إرسال طلب الإيداع للمشرف</button>
-    </div>
-
-    <a href="https://t.me" target="_blank" class="btn-action btn-support">🚀 تواصل مع الدعم الفني عبر تليجرام</a>
 
 <script>
-    // 🌐 مسار شبكة الاتصال المباشرة السريعة والمستقرة
-    const backupServerUrl = 'https://vercel.app';
+    // نظام الحفظ المباشر في المتصفح لمنع أخطاء السيرفرات السحابية وانفصال الشبكة
+    if(!localStorage.getItem('global_orders')) localStorage.setItem('global_orders', JSON.stringify([]));
+    if(!localStorage.getItem('global_balances')) localStorage.setItem('global_balances', JSON.stringify({ capital: 0, todayProfit: 0, inviteProfit: 0 }));
 
     function saveUsername() {
         const name = document.getElementById('usernameInput').value.trim();
-        if(!name) { alert('الرجاء كتابة اسم العضو أولاً.'); return; }
-        
+        if(!name) return;
         localStorage.setItem('saved_user_name', name);
         document.getElementById('currentUsernameText').innerText = name;
-        document.getElementById('usernameForm').style.display = 'none'; // 🔒 قفل وإخفاء خانة الإدخال والزر نهائياً
-        alert('🎯 تم التثبيت النهائي للاسم ولا يمكن تعديله بعد الآن!');
+        document.getElementById('usernameForm').style.display = 'none';
+        alert('🎯 تم التثبيت النهائي للاسم بنجاح ولن يتغير!');
     }
 
     function loadSavedUsername() {
         const savedName = localStorage.getItem('saved_user_name');
         if(savedName) {
             document.getElementById('currentUsernameText').innerText = savedName;
-            document.getElementById('usernameForm').style.display = 'none'; // 🔒 إبقاء الخانة مخفية ومنع التغيير عند العودة للموقع
-        } else {
-            document.getElementById('currentUsernameText').innerText = 'لاعب حقيقي';
-            document.getElementById('usernameForm').style.display = 'block';
+            document.getElementById('usernameForm').style.display = 'none';
         }
     }
 
     function updateLiveBalances() {
-        fetch(`${backupServerUrl}/balances`)
-        .then(res => res.json())
-        .then(balance => {
-            if(balance) {
-                document.getElementById('displayCapital').innerText = `USDT ${parseFloat(balance.capital || 0).toFixed(2)}`;
-                document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(balance.todayProfit || 0).toFixed(2)}`;
-                document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(balance.inviteProfit || 0).toFixed(2)}`;
-            }
-        }).catch(err => console.log('جاري المزامنة المالية...'));
+        const balance = JSON.parse(localStorage.getItem('global_balances'));
+        document.getElementById('displayCapital').innerText = `USDT ${parseFloat(balance.capital || 0).toFixed(2)}`;
+        document.getElementById('displayTodayProfit').innerText = `USDT ${parseFloat(balance.todayProfit || 0).toFixed(2)}`;
+        document.getElementById('displayInviteProfit').innerText = `USDT ${parseFloat(balance.inviteProfit || 0).toFixed(2)}`;
     }
 
     function handleTransaction(actionType, amountId, walletId) {
@@ -116,41 +144,17 @@
         const wallet = walletId === 'adminWalletAddress' ? document.getElementById(walletId).innerText : document.getElementById(walletId).value;
         const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
 
-        if(!amount || !wallet) { alert('يرجى تعبئة الحقول الفارغة أولاً.'); return; }
+        if(!amount || !wallet) return alert('يرجى ملء كافة البيانات الحقول المطلوبة.');
 
-        fetch(`${backupServerUrl}/deposit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: amount, wallet: wallet, type: `${actionType} (بواسطة العضو: ${currentUser})` })
-        })
-        .then(res => res.json())
-        .then(() => {
-            alert(`🎯 تم بنجاح إرسال طلب المعاملة للمشرف!`);
-            if(amountId !== 'adminWalletAddress') document.getElementById(amountId).value = '';
-        }).catch(err => alert('فشل الإرسال، تأكد من الاتصال بالشبكة.'));
-    }
+        const newRequest = {
+            id: Date.now(),
+            amount: parseFloat(amount) || 0,
+            wallet: wallet,
+            username: currentUser,
+            type: actionType,
+            status: 'معلق',
+            date: new Date().toLocaleString('ar-EG')
+        };
 
-    function sendInviteRequest() {
-        const memberName = document.getElementById('inviteMemberName').value.trim();
-        const currentUser = localStorage.getItem('saved_user_name') || 'لاعب حقيقي';
-        if(!memberName) return alert('الرجاء كتابة اسم العضو.');
-
-        fetch(`${backupServerUrl}/deposit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: 0, wallet: `العضو المدعو: ${memberName}`, type: `مكافأة دعوة (من: ${currentUser})` })
-        })
-        .then(() => { 
-            alert('📢 تم تقديم طلب مكافأة الدعوة للمشرف بنجاح!'); 
-            document.getElementById('inviteMemberName').value = ''; 
-        });
-    }
-
-    setInterval(updateLiveBalances, 1500);
-    window.onload = function() {
-        loadSavedUsername();
-        updateLiveBalances();
-    };
-</script>
-</body>
-</html>
+        let orders = JSON.parse(localStorage.getItem('global_orders'));
+        

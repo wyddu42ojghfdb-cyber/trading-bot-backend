@@ -2,102 +2,69 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// 🔒 تفعيل حماية CORS المتقدمة لربط الهواتف المختلفة ببعضها دون حظر أمني
 app.use(cors());
 app.use(express.json());
 
-// 💾 المخازن السحابية الدائمة داخل السيرفر لضمان ثبات البيانات حياً
-let globalOrders = [];
-let globalBalances = { 
-    capital: 0, 
-    todayProfit: 0, 
-    inviteProfit: 0, 
-    teamCount: 0 
-};
+// قواعد بيانات مؤقتة لتخزين الطلبات وبيانات المستخدمين
+let orders = [];
+let usersData = {};
 
-// فحص جاهزية اتصال السيرفر الأساسي
-app.get('/', (req, res) => {
-    res.json({ message: "Trading Bot Cloud Server Active and Fully Integrated!" });
+// 1. استقبال الطلبات من شاشة المستخدم
+app.post('/api/orders', (req, res) => {
+    const order = req.body;
+    order.id = Date.now().toString(); // توليد رقم مميز لكل طلب
+    orders.push(order);
+    console.log(`📥 طلب جديد من العضو: ${order.username} - النوع: ${order.type}`);
+    res.status(200).json({ success: true, message: 'تم استلام الطلب بنجاح' });
 });
 
-// 1️⃣ مسار جلب الأرصدة وعداد الفريق الحالي لواجهة المستخدم حياً
-app.get('/api/balances', (req, res) => {
-    res.json(globalBalances);
+// 2. إرسال الطلبات المعلقة إلى لوحة المشرف
+app.get('/api/admin/orders', (req, res) => {
+    // إرسال الطلبات التي لم يتم اتخاذ إجراء بشأنها بعد
+    res.json(orders.filter(o => o.status !== 'تم القبول' && o.status !== 'تم الرفض'));
 });
 
-// 2️⃣ مسار جلب كافة الطلبات والمعاملات الحية لشاشة المشرف
-app.get('/api/requests', (req, res) => {
-    res.json(globalOrders);
-});
+// 3. معالجة قرار المشرف (قبول أو رفض)
+app.post('/api/admin/action', (req, res) => {
+    const { orderId, action } = req.body;
+    const orderIndex = orders.findIndex(o => o.id === orderId);
 
-// 3️⃣ مسار استقبال المعاملات الجديدة (إيداع / سحب مقسم / مكافآت) من المستخدم
-app.post('/api/deposit', (req, res) => {
-    const { amount, wallet, username, type } = req.body;
-    
-    const newRequest = {
-        id: Date.now(),
-        amount: parseFloat(amount) || 0,
-        wallet: wallet,
-        username: username || 'لاعب حقيقي',
-        type: type,
-        status: 'معلق',
-        date: new Date().toLocaleString('ar-EG')
-    };
-    
-    globalOrders.push(newRequest);
-    res.status(201).json({ success: true, data: newRequest });
-});
-
-// 4️⃣ مسار معالجة موافقة أو رفض المشرف وتحديث الأرقام والعدادات حياً
-app.post('/api/update-status', (req, res) => {
-    const { id, newStatus } = req.body;
-    
-    globalOrders = globalOrders.map(req => {
-        if (req.id === id && req.status === 'معلق') {
-            req.status = newStatus;
-            
-            // 📊 تطبيق العمليات الحسابية والعدادات فوراً في السيرفر عند ضغط المشرف "موافق"
-            if (newStatus === 'تم القبول') {
-                if (req.type === 'إيداع رأس مال') {
-                    globalBalances.capital += req.amount;
-                } else if (req.type === 'سحب رأس المال الكلّي') {
-                    globalBalances.capital = Math.max(0, globalBalances.capital - req.amount);
-                } else if (req.type === 'سحب أرباح اليوم') {
-                    globalBalances.todayProfit = Math.max(0, globalBalances.todayProfit - req.amount);
-                } else if (req.type === 'سحب أرباح الدعوة') {
-                    globalBalances.inviteProfit = Math.max(0, globalBalances.inviteProfit - req.amount);
-                } else if (req.type === 'طلب مكافأة دعوة صديق') {
-                    globalBalances.teamCount += 1; // 🏆 زيادة عداد أعضاء الفريق تلقائياً فوراً للمستخدم
-                    globalBalances.inviteProfit += req.amount; // 👥 إضافة رصيد المكافأة (15 USDT) مباشرة لحساب العميل
-                }
-            }
-        }
-        return req;
-    });
-    
-    res.json({ success: true, balances: globalBalances });
-});
-
-// 5️⃣ 🚀 مسار بث أرباح الصفقة اليومية (نسبة 15%) من المشرف لجميع المشتركين
-app.post('/api/broadcast', (req, res) => {
-    if (globalBalances.capital <= 0) {
-        return res.json({ success: false, message: "رأس مال المشتركين صفر حالياً" });
+    if (orderIndex === -1) {
+        return res.status(404).json({ success: false, error: 'الطلب غير موجود' });
     }
-    
-    // حساب الـ 15% من إجمالي رأس المال الحالي وضخها في أرباح اليوم حياً
-    const profitCalculated = globalBalances.capital * 0.15;
-    globalBalances.todayProfit += profitCalculated;
-    
-    res.json({ success: true, profit: profitCalculated, balances: globalBalances });
+
+    const order = orders[orderIndex];
+    order.status = action === 'accept' ? 'تم القبول' : 'تم الرفض';
+
+    // إذا وافق المشرف، نقوم بتحديث رصيد المستخدم تلقائياً
+    if (action === 'accept') {
+        if (!usersData[order.username]) {
+            usersData[order.username] = { capital: 0, todayProfit: 0, teamCount: 0 };
+        }
+
+        if (order.type === 'إيداع') {
+            usersData[order.username].capital += parseFloat(order.amount);
+        } else if (order.type === 'سحب') {
+            usersData[order.username].capital = Math.max(0, usersData[order.username].capital - parseFloat(order.amount));
+        } else if (order.type === 'مكافأة دعوة') {
+            usersData[order.username].teamCount += 1;
+            usersData[order.username].todayProfit += 15; // إضافة مكافأة فورية مثلاً بقيمة 15 دولار
+        }
+    }
+
+    console.log(`🎯 قام المشرف بـ ${action === 'accept' ? 'قبول' : 'رفض'} طلب العضو: ${order.username}`);
+    res.json({ success: true });
 });
 
-// 6️⃣ مسار تنظيف اللوحة وتصفير الحسابات تماماً
-app.post('/api/clear', (req, res) => {
-    globalOrders = [];
-    res.json({ success: true });
-}
+// 4. فحص دوري من شاشة المستخدم لمعرفة رصيده المحدث
+app.get('/api/users/:username', (req, res) => {
+    const username = req.params.username;
+    if (usersData[username]) {
+        res.json(usersData[username]);
+    } else {
+        res.json({ capital: 0, todayProfit: 0, teamCount: 0 });
+    }
+});
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server is running smoothly on port ${PORT}`));
-
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 السيرفر يعمل بكفاءة فائقة الآن على المنفذ ${PORT}`));

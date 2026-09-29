@@ -2,19 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// تفعيل حماية CORS للسماح للمتصفح بنقل البيانات بين الشاشات بأمان
 app.use(cors());
 app.use(express.json());
 
-// مصفوفة (مخزن مؤقت) لحفظ الطلبات القادمة من المستخدمين
 let productionRequests = [];
 
-// رابط لفحص عمل السيرفر الأساسي
 app.get('/', (req, res) => {
     res.json({ message: "Trading Bot Backend Running Successfully" });
 });
 
-// 1. مسار استقبال طلب جديد من واجهة المستخدم (index.html)
+// استقبال طلبات الإيداع والسحب من واجهة المستخدم الجديدة
 app.post('/api/deposit', (req, res) => {
     const { amount, wallet, type } = req.body;
     
@@ -31,18 +28,17 @@ app.post('/api/deposit', (req, res) => {
     res.status(201).json({ success: true, message: "تم إرسال الطلب للمشرف بنجاح", data: newRequest });
 });
 
-// 2. مسار جلب الطلبات لواجهة المشرف (admin.html)
+// جلب الطلبات لتعرض داخل شاشة المشرف
 app.get('/api/requests', (req, res) => {
     res.json(productionRequests);
 });
 
-// 3. مسار مسح أو تحديث الطلبات (عندما يوافق المشرف أو يرفض)
+// مسح الطلبات من شاشة المراقبة
 app.post('/api/clear', (req, res) => {
     productionRequests = [];
-    res.json({ success: true, message: "تم تنظيف شاشة المراقبة" });
+    res.json({ success: true });
 });
 
-// تشغيل السيرفر
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

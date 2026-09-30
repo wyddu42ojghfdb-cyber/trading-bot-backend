@@ -1,161 +1,188 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف</title>
+    <title>Bulut Yönetim Kontrol Paneli</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0b111e; color: #ffffff; margin: 0; padding: 20px; direction: rtl; }
-        .admin-container { max-width: 1000px; margin: 0 auto; }
-        h1, h2 { color: #2196f3; border-bottom: 2px solid #1e2d4a; padding-bottom: 10px; }
-        .stats-bar { display: flex; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background-color: #111a2e; padding: 15px; border-radius: 8px; border: 1px solid #1e2d4a; flex: 1; text-align: center; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #4fc3f7; margin-top: 5px; }
-        .profit-action-card { background-color: #1e2d4a; padding: 15px; border-radius: 8px; border: 1px solid #f57c00; margin-bottom: 25px; text-align: center; }
-        .order-table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: #111a2e; border: 1px solid #1e2d4a; border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
-        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #1e2d4a; }
-        th { background-color: #1e2d4a; color: #90a4ae; }
-        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 5px; }
-        .btn-success { background-color: #00e676; color: #000; }
-        .btn-danger { background-color: #ff5252; color: #fff; }
-        .btn-copy { background-color: #334155; color: #ffb74d; padding: 4px 8px; font-size: 12px; border-radius: 4px; margin-right: 5px; border: none; cursor: pointer; }
-        .btn-distribute { background-color: #f57c00; color: white; padding: 12px 30px; font-size: 15px; border-radius: 6px; border: none; cursor: pointer; }
+        body { font-family: Arial, sans-serif; background-color: #0b1426; color: white; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h2, h3 { text-align: center; color: #4facfe; }
+        .box { background: #152238; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1c2d4a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #0b1426; }
+        th, td { border: 1px solid #1c2d4a; padding: 10px; text-align: center; font-size: 13px; }
+        th { background-color: #1c2d4a; color: #4facfe; }
+        button { padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; margin: 2px; }
+        .btn-green { background-color: #38ef7d; color: #0b1426; }
+        .btn-red { background-color: #ff5858; }
+        .btn-blue { background-color: #0072ff; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
+        .stat-line { display: flex; justify-content: space-between; padding: 10px; font-size: 16px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h1>🖥️ لوحة تحكم المشرف السحابية</h1>
-        
-        <!-- 👥 عداد إجمالي عدد الأعضاء المسجلين حياً من السيرفر -->
-        <div class="stats-bar">
-            <div class="stat-card">
-                <div style="color: #90a4ae; font-size: 14px;">👥 إجمالي عدد الأعضاء المسجلين:</div>
-                <div class="stat-value" id="totalUsersCount">0</div>
-            </div>
-        </div>
+<div class="container">
+    <h2>💻 Bulut Yönetim Kontrol Paneli</h2>
 
-        <!-- 💰 زر التحكم اليدوي المضاف للمشرف لتوزيع الأرباح اليومية بنسبة 15% بنقرة واحدة -->
-        <div class="profit-action-card">
-            <h3 style="margin-top:0; color:#ffb74d;">⚙️ الإجراءات الجماعية اليومية:</h3>
-            <p style="font-size:13px; color:#90a4ae;">الضغط على هذا الزر يضيف ربح 15% فوراً لجميع الحسابات التي تمتلك رأس مال مشحون فقط:</p>
-            <button class="btn-distribute" onclick="triggerDailyDistribution()">💰 توزيع الأرباح اليومية المباشرة (15%)</button>
+    <!-- 1. إحصائيات عامة -->
+    <div class="box">
+        <div class="stat-line">
+            <span>👥 Kayıtlı Üye Sayısı Toplamı (المشتركين):</span>
+            <span id="totalUsers" style="color: #38ef7d;">0</span>
         </div>
+    </div>
 
-        <h2>📥 طلبات الأعضاء المنتظرة</h2>
-        <table class="order-table">
+    <!-- 2. أزرار التحكم السريع وتوزيع الأرباح -->
+    <div class="box">
+        <h3>⚙ Günlük Grup Prosedürleri</h3>
+        <p style="font-size: 12px; color: #a0aec0; text-align: center;">Bu butona tıklamak, bakiyesi bulunan tüm azalara anında %15 kâr ekler.</p>
+        <button class="btn-blue" onclick="distributeProfits()">💰 Doğrudan günlük kâr dağıtımı (%15)</button>
+    </div>
+
+    <!-- 3. جدول طلبات السحب والإيداع المنتظرة -->
+    <div class="box">
+        <h3>📩 Bekleyen Üye İstekleri</h3>
+        <table>
             <thead>
                 <tr>
-                    <th>اسم المستخدم</th>
-                    <th>نوع الطلب</th>
-                    <th>المبلغ / التفاصيل</th>
-                    <th>المحفظة / تفاصيل الإرسال (مع إمكانية النسخ)</th>
-                    <th>القرار الرسمي للمشرف</th>
+                    <th>Kullanıcı Adı</th>
+                    <th>Sipariş Türü</th>
+                    <th>Miktar / Detaylar</th>
+                    <th>Cüzdan Adresi</th>
+                    <th>Denetleyicinin Kararı</th>
                 </tr>
             </thead>
-            <tbody id="ordersTableBody"></tbody>
-        </table>
-
-        <h2>📊 مراقبة أرصدة وأرباح ومميزات الأعضاء حياً</h2>
-        <table class="order-table">
-            <thead>
-                <tr>
-                    <th>اسم المستخدم</th>
-                    <th>رأس المال الكلي</th>
-                    <th>أرباح اليوم الحالية 📊</th>
-                    <th>أرباح المكافآت 🎁</th>
-                    <th>عدد الفريق</th>
-                </tr>
-            </thead>
-            <tbody id="profitsTableBody"></tbody>
+            <tbody id="ordersTable">
+                <tr><td colspan="5" style="color: #a0aec0;">Bekleyen istek bulunmuyor...</td></tr>
+            </tbody>
         </table>
     </div>
 
+    <!-- 4. جدول أرصدة وأرباح جميع المستخدمين المسجلين -->
+    <div class="box">
+        <h3>📊 Üyelerin Bakiyelerini Canlı Takip Edin</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                    <th>Toplam Sermaye</th>
+                    <th>Bugünkü Güncel Kâr</th>
+                    <th>Bonus Kazançları</th>
+                    <th>Takım Numarası</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+                <tr><td colspan="5" style="color: #a0aec0;">Kayıtlı üye bulunmuyor...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script>
-    // ⚙️ تم الربط المباشر برابط سيرفر Render السحابي المستقر والجديد الخاص بكم
-    const CLOUD_SERVER_URL = "https://trading-bot-backend-1-flfd.onrender.com";
+    const API_BASE_URL = "https://onrender.com";
 
-    function refreshLiveAdminData() {
-        // 1. جلب طلبات السحب والإيداع ومكافآت الدعوة المعلقة
-        fetch(`${CLOUD_SERVER_URL}/api/admin/orders`)
-        .then(res => res.json())
-        .then(orders => {
-            const tbody = document.getElementById('ordersTableBody');
-            tbody.innerHTML = orders.length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد طلبات معلقة حالياً... الجدول نظيف!</td></tr>` : '';
+    // 1. جلب وعرض طلبات السحب والإيداع المنتظرة
+    async function loadOrders() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/orders`);
+            const orders = await res.json();
+            const tbody = document.getElementById('ordersTable');
+            tbody.innerHTML = '';
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color: #a0aec0;">Bekleyen istek bulunmuyor...</td></tr>';
+                return;
+            }
+
             orders.forEach(order => {
-                const infoAmount = order.amount ? `${order.amount} USDT` : 'طلب مكافأة';
-                const infoAddress = order.wallet ? order.wallet : `صديق: ${order.friendName}`;
-                
-                // زر نسخ المحفظة البرمجي التلقائي
-                const copyButtonHtml = order.wallet ? `<button class="btn btn-copy" onclick="navigator.clipboard.writeText('${order.wallet}'); alert('تم نسخ عنوان المحفظة!')">📋 نسخ</button>` : '';
-
                 tbody.innerHTML += `
                     <tr>
-                        <td style="color:#4fc3f7; font-weight:bold;">${order.username}</td>
-                        <td>${order.type}</td>
-                        <td>${infoAmount}</td>
-                        <td style="font-family:monospace; color:#ffb74d;">
-                            <span>${infoAddress}</span> ${copyButtonHtml}
-                        </td>
+                        <td><b>${order.username}</b></td>
+                        <td><span style="color: ${order.type === 'Yatırma' ? '#38ef7d' : '#ff5858'}">${order.type}</span></td>
+                        <td>USDT ${order.amount.toFixed(2)}</td>
+                        <td><small>${order.address || '-'}</small></td>
                         <td>
-                            <button class="btn btn-success" onclick="takeAction('${order.id}', 'accept')">✅ قبول</button>
-                            <button class="btn btn-danger" onclick="takeAction('${order.id}', 'reject')">❌ رفض</button>
+                            <button class="btn-green" onclick="handleAction('${order.id}', 'accept')">Onayla</button>
+                            <button class="btn-red" onclick="handleAction('${order.id}', 'reject')">Reddet</button>
                         </td>
-                    </tr>`;
+                    </tr>
+                `;
             });
-        });
+        } catch (err) { console.error('İstekler yüklenemedi:', err); }
+    }
 
-        // 2. جلب وتحديث الأرصدة وإجمالي أعداد المشتركين حياً
-        fetch(`${CLOUD_SERVER_URL}/api/admin/users-profits`)
-        .then(res => res.json())
-        .then(users => {
-            const tbody = document.getElementById('profitsTableBody');
-            tbody.innerHTML = Object.keys(users).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:#90a4ae;">لا توجد بيانات مسجلة للأعضاء حتى الآن...</td></tr>` : '';
-            
-            // تحديث عداد أعداد المستخدمين الإجمالي ديناميكياً
-            const totalUsers = Object.keys(users).length;
-            document.getElementById('totalUsersCount').innerText = totalUsers;
+    // 2. جلب وعرض قائمة المستخدمين وأرصدتهم كاملة
+    async function loadUsersData() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/users-profits`);
+            const usersData = await res.json();
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
 
-            for (let username in users) {
+            const usernames = Object.keys(usersData);
+            document.getElementById('totalUsers').innerText = usernames.length;
+
+            if (usernames.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color: #a0aec0;">Kayıtlı üye bulunmuyor...</td></tr>';
+                return;
+            }
+
+            usernames.forEach(username => {
+                const user = usersData[username];
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${username}</b></td>
-                        <td style="color:#ffb74d;">USDT ${(users[username].capital || 0).toFixed(2)}</td>
-                        <td style="color:#00e676; font-weight:bold;">USDT ${(users[username].todayProfit || 0).toFixed(2)}</td>
-                        <td style="color:#ba68c8;">USDT ${(users[username].inviteProfit || 0).toFixed(2)}</td>
-                        <td>${users[username].teamCount || 0} أعضاء نشطين</td>
-                    </tr>`;
+                        <td style="color: #38ef7d;">USDT ${user.capital.toFixed(2)}</td>
+                        <td style="color: #0072ff;">USDT ${user.todayProfit.toFixed(2)}</td>
+                        <td>USDT ${user.inviteProfit.toFixed(2)}</td>
+                        <td>${user.teamCount} / 40</td>
+                    </tr>
+                `;
+            });
+        } catch (err) { console.error('Kullanıcılar yüklenemedi:', err); }
+    }
+
+    // 3. اتخاذ إجراء (قبول أو رفض) طلب السحب أو الإيداع
+    async function handleAction(orderId, action) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/action`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, action })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(action === 'accept' ? 'İşlem Başarıyla Onaylandı!' : 'İşlem Reddedildi!');
+                loadOrders();
+                loadUsersData();
             }
-        });
+        } catch (err) { alert('İşlem başarısız oldu!'); }
     }
 
-    // دالة إرسال أمر توزيع أرباح الـ 15% يدوياً عند ضغط المشرف
-    function triggerDailyDistribution() {
-        if(confirm("هل أنت متأكد من رغبتك في توزيع أرباح الـ 15% يدوياً على كافة الحسابات النشطة الآن؟")) {
-            fetch(`${CLOUD_SERVER_URL}/api/admin/distribute-profits`, { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                refreshLiveAdminData();
-            })
-            .catch(err => alert("فشل إرسال أمر التوزيع السحابي لـ Render."));
-        }
+    // 4. توزيع أرباح الـ 15% اليومية على الجميع بضغطة زر
+    async function distributeProfits() {
+        if (!confirm('Tüm aktif üyelere %15 kâr dağıtmak istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/distribute-profits`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Kâr payları başarıyla dağıtıldı!');
+                loadUsersData();
+            }
+        } catch (err) { alert('Dağıtım işlemi başarısız oldu!'); }
     }
 
-    // دالة تنفيذ قرار القبول والرفض للطلبات في الجدول
-    function takeAction(orderId, action) {
-        fetch(`${CLOUD_SERVER_URL}/api/admin/action`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId, action })
-        })
-        .then(res => res.json())
-        .then(data => { if(data.success) refreshLiveAdminData(); });
-    }
+    // تشغيل التحديث التلقائي للبيانات كل 5 ثوانٍ داخل لوحة المشرف
+    setInterval(() => {
+        loadOrders();
+        loadUsersData();
+    }, 5000);
 
-    // تحديث الشاشة تلقائياً كل ثانيتين لمتابعة الطلبات الجديدة فوراُ دون تجميد
-    setInterval(refreshLiveAdminData, 2000);
-    window.onload = refreshLiveAdminData;
+    // تحميل البيانات فور فتح الصفحة
+    window.onload = function() {
+        loadOrders();
+        loadUsersData();
+    };
 </script>
 </body>
 </html>

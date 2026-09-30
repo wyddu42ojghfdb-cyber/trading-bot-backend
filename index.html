@@ -11,33 +11,30 @@
             color: #ffffff;
             margin: 0;
             padding: 20px;
-            direction: ltr;
         }
         .container {
             max-width: 500px;
             margin: 0 auto;
-            background: #152238;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        h2 { text-align: center; color: #4facfe; margin-bottom: 25px; }
-        .section {
-            background: #1c2d4a;
+        h2 { text-align: center; color: #ffffff; margin-bottom: 20px; font-size: 22px; }
+        .box {
+            background-color: #152238;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 15px;
+            border: 1px solid #1c2d4a;
         }
-        label { display: block; font-weight: bold; margin-bottom: 8px; color: #a0aec0; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; color: #a0aec0; }
         input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             border: 1px solid #2d3748;
-            background: #0b1426;
+            background-color: #0b1426;
             color: #fff;
             box-sizing: border-box;
             margin-bottom: 10px;
+            font-size: 14px;
         }
         button {
             width: 100%;
@@ -45,95 +42,80 @@
             border: none;
             border-radius: 6px;
             font-weight: bold;
+            font-size: 14px;
             cursor: pointer;
-            transition: 0.3s;
             margin-top: 5px;
+            color: white;
         }
-        .btn-blue { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; }
-        .btn-green { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
-        .btn-orange { background: linear-gradient(135deg, #f857a6, #ff5858); color: white; }
-        button:hover { opacity: 0.9; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-box { background: #0b1426; padding: 10px; border-radius: 6px; text-align: center; }
-        .stat-val { font-size: 18px; font-weight: bold; color: #38ef7d; margin-top: 5px; }
-        .alert { color: #ff5858; font-size: 12px; margin-top: 5px; display: block; }
+        .btn-blue { background-color: #0072ff; }
+        .btn-green { background-color: #38ef7d; color: #0b1426; }
+        .btn-orange { background-color: #ff5858; }
+        .stats { margin-top: 10px; }
+        .stat-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1c2d4a; }
+        .stat-line:last-child { border-bottom: none; }
+        .alert { color: #ff5858; font-size: 12px; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📊 Trading Platform</h2>
+    <h2>Trading Platform</h2>
 
-    <!-- 1. Kullanıcı Kayıt Bölümü -->
-    <div class="section">
-        <label for="username">👤 Mevcut Kullanıcı Adı (اسم المستخدم):</label>
-        <input type="text" id="username" placeholder="Kullanıcı adınızı girin...">
-        <button class="btn-blue" onclick="registerUser()">💾 Kaydet ve Kilitle (حفظ وقفل)</button>
+    <div class="box">
+        <label>👤 Mevcut Kullanıcı Adı:</label>
+        <input type="text" id="username" placeholder="Lütfen kullanıcı adınızı kilitleyin">
+        <button class="btn-blue" onclick="registerUser()">💾 Kaydet ve Kilitle</button>
     </div>
 
-    <!-- 2. Görev ve Ekip Bilgileri -->
-    <div class="section">
+    <div class="box">
         <label>🏆 Büyük Ödül (40 üye): 2500 ABD doları</label>
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div style="font-size: 12px; color: #a0aec0;">Aktif Ekip Üyeleriniz</div>
-                <div class="stat-val" id="teamCount">0 / 40</div>
+        <label>Aktif ekip üyeleriniz: <span id="teamCount" style="color:#38ef7d; font-weight:bold;">0 / 40</span></label>
+        <button class="btn-orange" onclick="sendBonusRequest()">📢 Bonusu Yöneticiye Gönder</button>
+    </div>
+
+    <div class="box">
+        <div class="stats">
+            <div class="stat-line">
+                <span>💰 Toplam Sermaye:</span>
+                <span id="capital" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
             </div>
-            <div class="stat-box">
-                <button class="btn-orange" style="padding: 8px; font-size: 11px;" onclick="sendBonusRequest()">📢 Bonusu Yöneticiye Gönder</button>
+            <div class="stat-line">
+                <span>📊 Bugünkü Kâr:</span>
+                <span id="todayProfit" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
+            </div>
+            <div class="stat-line">
+                <span>🎁 Bilet gelirleri ve davetiye ödülleri:</span>
+                <span id="inviteProfit" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
             </div>
         </div>
     </div>
 
-    <!-- 3. Finansal Durum Paneli -->
-    <div class="section">
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div style="font-size: 12px; color: #a0aec0;">💰 Toplam Sermaye</div>
-                <div class="stat-val" id="capital">USDT 0.00</div>
-            </div>
-            <div class="stat-box">
-                <div style="font-size: 12px; color: #a0aec0;">📊 Bugünkü Kâr</div>
-                <div class="stat-val" id="todayProfit">USDT 0.00</div>
-            </div>
-        </div>
-        <div class="stat-box" style="margin-top: 10px;">
-            <div style="font-size: 12px; color: #a0aec0;">🎁 Bilet Gelirleri ve Davetiye</div>
-            <div class="stat-val" id="inviteProfit">USDT 0.00</div>
-        </div>
-    </div>
-
-    <!-- 4. Para Çekme Butonları -->
-    <div class="section">
-        <label>🚨 Anında Para Çekme İşlemleri (TRC-20):</label>
-        <input type="text" id="withdrawAddress" placeholder="TRC-20 Cüzdan Adresiniz...">
-        <button class="btn-orange" style="margin-bottom: 5px;" onclick="withdraw('Toplam Sermayeyi Çek')">💸 Toplam Sermayeyi Çek</button>
-        <button class="btn-blue" style="margin-bottom: 5px;" onclick="withdraw('Bugünkü Kârı Çek')">📊 Bugünkü Kârı Çek</button>
+    <div class="box">
+        <label>🚨 Anında Para Çekme İşlemleri Paneli (TRC-20 Ağı):</label>
+        <input type="text" id="withdrawAddress" placeholder="Cüzdan Adresinizi Girin...">
+        <button class="btn-orange" style="margin-bottom:8px;" onclick="withdraw('Toplam Sermayeyi Çek')">💸 Toplam Sermayeyi Çek</button>
+        <button class="btn-blue" style="margin-bottom:8px;" onclick="withdraw('Bugünkü Kârı Çek')">📊 Bugünkü Kârı Çek</button>
         <button class="btn-blue" onclick="withdraw('Davetiye Ödülünü Çek')">🎁 Davetiye Ödülünü Çek</button>
     </div>
 
-    <!-- 5. Para Yatırma Bölümü -->
-    <div class="section">
+    <div class="box">
         <label>📥 Para Yatırma İsteği (USDT TRC-20):</label>
-        <input type="text" id="walletAddress" value="TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN" readonly style="text-align: center; color: #38ef7d; font-weight: bold;">
-        <button class="btn-blue" onclick="copyWallet()">📋 Cüzdan Adresini Kopyala</button>
+        <input type="text" id="walletAddress" value="TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN" readonly style="text-align:center; color:#38ef7d; font-weight:bold;">
+        <button class="btn-blue" style="margin-bottom:12px;" onclick="copyWallet()">📋 Cüzdan Adresini Kopyala</button>
         
-        <label style="margin-top: 15px;">Yatırılan Miktar (Miktar):</label>
-        <input type="number" id="depositAmount" placeholder="Örnek: 100" min="100">
+        <label>Yatırmak İstediğiniz Miktar:</label>
+        <input type="number" id="depositAmount" placeholder="Miktar girin...">
         <span class="alert">⚠ Minimum para yatırma miktarı 100 USD'dir</span>
-        <button class="btn-green" style="margin-top: 10px;" onclick="sendDeposit()">⚡ Para Yatırma İsteği Gönder</button>
+        <button class="btn-green" style="margin-top:8px;" onclick="sendDeposit()">⚡ Para Yatırma İsteği Gönder</button>
     </div>
 </div>
 
 <script>
-    // الرابط المباشر والسليم لسيرفر ريندر بدون أي علامات مائلة زائدة في الآخر
     const API_BASE_URL = "https://onrender.com";
 
-    // دالة قفل وحفظ اسم المستخدم
     async function registerUser() {
         const username = document.getElementById('username').value.trim();
         if(!username) return alert('Lütfen geçerli bir kullanıcı adı girin!');
-
         try {
             const res = await fetch(`${API_BASE_URL}/api/register-user`, {
                 method: 'POST',
@@ -142,19 +124,13 @@
             });
             const data = await res.json();
             if(data.success) {
-                alert('Kullanıcı adı başarıyla kilitlendi! (تم قفل الحساب بنجاح)');
+                alert('Kullanıcı adı başarıyla kilitlendi!');
                 localStorage.setItem('savedUsername', username);
                 loadUserData(username);
-            } else {
-                alert('Hata oluştu: ' + data.error);
             }
-        } catch(err) {
-            console.error(err);
-            alert('Sunucu bağlantı hatası! (فشل الاتصال بالسيرفر)');
-        }
+        } catch(err) { alert('Sunucu bağlantı hatası!'); }
     }
 
-    // دالة تحديث الأرصدة تلقائياً من السيرفر لشاشة المستخدم
     async function loadUserData(username) {
         if(!username) return;
         try {
@@ -164,18 +140,14 @@
             document.getElementById('todayProfit').innerText = `USDT ${data.todayProfit.toFixed(2)}`;
             document.getElementById('inviteProfit').innerText = `USDT ${data.inviteProfit.toFixed(2)}`;
             document.getElementById('teamCount').innerText = `${data.teamCount} / 40`;
-        } catch(err) {
-            console.error('Veri yükleme hatası:', err);
-        }
+        } catch(err) { console.error(err); }
     }
 
-    // دالة إرسال طلبات السحب الثلاثة ومكافأة الدعوة
     async function withdraw(type) {
         const username = localStorage.getItem('savedUsername');
         const address = document.getElementById('withdrawAddress').value.trim();
         if(!username) return alert('Lütfen önce kullanıcı adınızı kilitleyin!');
-        if(!address) return alert('Lütfen TRC-20 cüzdan adresinizi girin!');
-
+        if(!address) return alert('Lütfen cüzdan adresinizi girin!');
         try {
             const res = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
@@ -183,21 +155,15 @@
                 body: JSON.stringify({ username, type, address, amount: 0 })
             });
             const data = await res.json();
-            if(data.success) {
-                alert('Çekim talebi gönderildi! (تم إرسال طلب السحب بنجاح)');
-            }
-        } catch(err) {
-            alert('İşlem başarısız!');
-        }
+            if(data.success) alert('Çekim talebi gönderildi!');
+        } catch(err) { alert('İşlem başarısız!'); }
     }
 
-    // دالة إرسال طلبات الإيداع
     async function sendDeposit() {
         const username = localStorage.getItem('savedUsername');
         const amount = parseFloat(document.getElementById('depositAmount').value);
         if(!username) return alert('Lütfen önce kullanıcı adınızı kilitleyin!');
         if(isNaN(amount) || amount < 100) return alert('Minimum yatırım miktarı 100 USD\'dir!');
-
         try {
             const res = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
@@ -205,15 +171,10 @@
                 body: JSON.stringify({ username, type: 'Yatırma', amount, address: 'İsteği Gönderildi' })
             });
             const data = await res.json();
-            if(data.success) {
-                alert('Para yatırma isteği yöneticiye iletildi! (تم إرسال طلب الإيداع للمشرف)');
-            }
-        } catch(err) {
-            alert('İsteğiniz gönderilemedi.');
-        }
+            if(data.success) alert('Para yatırma isteği gönderildi!');
+        } catch(err) { alert('İsteğiniz gönderilemedi.'); }
     }
 
-    // دالة إرسال طلب مكافأة الدعوة للمشرف
     async function sendBonusRequest() {
         const username = localStorage.getItem('savedUsername');
         if(!username) return alert('Lütfen önce kullanıcı adınızı kilitleyin!');
@@ -228,8 +189,25 @@
         } catch(err) { alert('Hata!'); }
     }
 
-    // دالة نسخ محفظة الإيداع
     function copyWallet() {
         const copyText = document.getElementById("walletAddress");
         copyText.select();
-    
+        navigator.clipboard.writeText(copyText.value);
+        alert("Cüzdan adresi kopyalandı: " + copyText.value);
+    }
+
+    setInterval(() => {
+        const savedUsername = localStorage.getItem('savedUsername');
+        if(savedUsername) loadUserData(savedUsername);
+    }, 5000);
+
+    window.onload = function() {
+        const savedUsername = localStorage.getItem('savedUsername');
+        if(savedUsername) {
+            document.getElementById('username').value = savedUsername;
+            loadUserData(savedUsername);
+        }
+    }
+</script>
+</body>
+</html>

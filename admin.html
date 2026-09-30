@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bulut Yönetim Kontrol Paneli</title>
+    <title>لوحة تحكم المشرف السحابية</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #0b1426; color: white; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
+        body { font-family: Arial, sans-serif; background-color: #0b1426; color: white; padding: 20px; direction: rtl; }
+        .container { max-width: 850px; margin: 0 auto; }
         h2, h3 { text-align: center; color: #4facfe; }
         .box { background: #152238; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #1c2d4a; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #0b1426; }
@@ -22,57 +22,57 @@
 <body>
 
 <div class="container">
-    <h2>💻 Bulut Yönetim Kontrol Paneli</h2>
+    <h2>💻 لوحة تحكم إدارة المنصة السحابية</h2>
 
     <!-- 1. إحصائيات عامة -->
     <div class="box">
         <div class="stat-line">
-            <span>👥 Kayıtlı Üye Sayısı Toplamı (المشتركين):</span>
-            <span id="totalUsers" style="color: #38ef7d;">0</span>
+            <span>👥 إجمالي عدد الأعضاء المسجلين (المشتركين):</span>
+            <span id="totalUsers" style="color: #38ef7d; font-size: 20px;">0</span>
         </div>
     </div>
 
     <!-- 2. أزرار التحكم السريع وتوزيع الأرباح -->
     <div class="box">
-        <h3>⚙ Günlük Grup Prosedürleri</h3>
-        <p style="font-size: 12px; color: #a0aec0; text-align: center;">Bu butona tıklamak, bakiyesi bulunan tüm azalara anında %15 kâr ekler.</p>
-        <button class="btn-blue" onclick="distributeProfits()">💰 Doğrudan günlük kâr dağıtımı (%15)</button>
+        <h3>⚙ الإجراءات الجماعية اليومية</h3>
+        <p style="font-size: 13px; color: #a0aec0; text-align: center;">الضغط على هذا الزر سيقوم بإضافة أرباح يومية بنسبة 15% فوراً لجميع الأعضاء الذين يمتلكون رأس مال نشط.</p>
+        <button class="btn-blue" onclick="distributeProfits()">💰 توزيع الأرباح اليومية المباشرة (15%)</button>
     </div>
 
     <!-- 3. جدول طلبات السحب والإيداع المنتظرة -->
     <div class="box">
-        <h3>📩 Bekleyen Üye İstekleri</h3>
+        <h3>📩 طلبات الأعضاء المعلقة قيد الانتظار</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Kullanıcı Adı</th>
-                    <th>Sipariş Türü</th>
-                    <th>Miktar / Detaylar</th>
-                    <th>Cüzdan Adresi</th>
-                    <th>Denetleyicinin Kararı</th>
+                    <th>اسم المستخدم</th>
+                    <th>نوع الطلب</th>
+                    <th>المبلغ / التفاصيل</th>
+                    <th>عنوان المحفظة</th>
+                    <th>قرار المشرف (التحكم)</th>
                 </tr>
             </thead>
             <tbody id="ordersTable">
-                <tr><td colspan="5" style="color: #a0aec0;">Bekleyen istek bulunmuyor...</td></tr>
+                <tr><td colspan="5" style="color: #a0aec0;">لا توجد طلبات معلقة حالياً...</td></tr>
             </tbody>
         </table>
     </div>
 
     <!-- 4. جدول أرصدة وأرباح جميع المستخدمين المسجلين -->
     <div class="box">
-        <h3>📊 Üyelerin Bakiyelerini Canlı Takip Edin</h3>
+        <h3>📊 المراقبة الحية لأرصدة وأرباح الأعضاء</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Kullanıcı Adı</th>
-                    <th>Toplam Sermaye</th>
-                    <th>Bugünkü Güncel Kâr</th>
-                    <th>Bonus Kazançları</th>
-                    <th>Takım Numarası</th>
+                    <th>اسم المستخدم</th>
+                    <th>إجمالي رأس المال</th>
+                    <th>أرباح اليوم الحالية</th>
+                    <th>مكافآت الدعوة والتذاكر</th>
+                    <th>أعضاء الفريق النشطين</th>
                 </tr>
             </thead>
             <tbody id="usersTable">
-                <tr><td colspan="5" style="color: #a0aec0;">Kayıtlı üye bulunmuyor...</td></tr>
+                <tr><td colspan="5" style="color: #a0aec0;">لا يوجد أعضاء مسجلين بعد...</td></tr>
             </tbody>
         </table>
     </div>
@@ -90,25 +90,33 @@
             tbody.innerHTML = '';
 
             if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="color: #a0aec0;">Bekleyen istek bulunmuyor...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="color: #a0aec0;">لا توجد طلبات معلقة حالياً...</td></tr>';
                 return;
             }
 
             orders.forEach(order => {
+                // ترجمة نوع الطلب للعربية ليظهر بشكل احترافي في الجدول
+                let typeArabic = order.type;
+                if(order.type === 'Yatırma') typeArabic = 'إيداع جديد';
+                else if(order.type === 'Toplam Sermayeyi Çek') typeArabic = 'سحب رأس المال';
+                else if(order.type === 'Bugünkü Kârı Çek') typeArabic = 'سحب أرباح اليوم';
+                else if(order.type === 'Davetiye Ödülünü Çek') typeArabic = 'سحب مكافأة الدعوة';
+                else if(order.type === 'Referans Bonusunu Çek') typeArabic = 'طلب مكافأة الفريق';
+
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${order.username}</b></td>
-                        <td><span style="color: ${order.type === 'Yatırma' ? '#38ef7d' : '#ff5858'}">${order.type}</span></td>
+                        <td><span style="color: ${order.type === 'Yatırma' ? '#38ef7d' : '#ff5858'}">${typeArabic}</span></td>
                         <td>USDT ${order.amount.toFixed(2)}</td>
-                        <td><small>${order.address || '-'}</small></td>
+                        <td><small style="direction: ltr; display:block;">${order.address || '-'}</small></td>
                         <td>
-                            <button class="btn-green" onclick="handleAction('${order.id}', 'accept')">Onayla</button>
-                            <button class="btn-red" onclick="handleAction('${order.id}', 'reject')">Reddet</button>
+                            <button class="btn-green" onclick="handleAction('${order.id}', 'accept')">موافقة</button>
+                            <button class="btn-red" onclick="handleAction('${order.id}', 'reject')">رفض</button>
                         </td>
                     </tr>
                 `;
             });
-        } catch (err) { console.error('İstekler yüklenemedi:', err); }
+        } catch (err) { console.error('تعذر تحميل الطلبات:', err); }
     }
 
     // 2. جلب وعرض قائمة المستخدمين وأرصدتهم كاملة
@@ -123,7 +131,7 @@
             document.getElementById('totalUsers').innerText = usernames.length;
 
             if (usernames.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="color: #a0aec0;">Kayıtlı üye bulunmuyor...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="color: #a0aec0;">لا يوجد أعضاء مسجلين بعد...</td></tr>';
                 return;
             }
 
@@ -132,17 +140,17 @@
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${username}</b></td>
-                        <td style="color: #38ef7d;">USDT ${user.capital.toFixed(2)}</td>
-                        <td style="color: #0072ff;">USDT ${user.todayProfit.toFixed(2)}</td>
+                        <td style="color: #38ef7d; font-weight: bold;">USDT ${user.capital.toFixed(2)}</td>
+                        <td style="color: #0072ff; font-weight: bold;">USDT ${user.todayProfit.toFixed(2)}</td>
                         <td>USDT ${user.inviteProfit.toFixed(2)}</td>
                         <td>${user.teamCount} / 40</td>
                     </tr>
                 `;
             });
-        } catch (err) { console.error('Kullanıcılar yüklenemedi:', err); }
+        } catch (err) { console.error('تعذر تحميل بيانات الأعضاء:', err); }
     }
 
-    // 3. اتخاذ إجراء (قبول أو رفض) طلب السحب أو الإيداع
+    // 3. اتخاذ إجراء (قبول أو رفض) طلب السحب أو الإيداع لتعديل الرصيد تلقائياً
     async function handleAction(orderId, action) {
         try {
             const res = await fetch(`${API_BASE_URL}/api/admin/action`, {
@@ -152,27 +160,27 @@
             });
             const data = await res.json();
             if (data.success) {
-                alert(action === 'accept' ? 'İşlem Başarıyla Onaylandı!' : 'İşlem Reddedildi!');
+                alert(action === 'accept' ? 'تمت الموافقة على العملية بنجاح وتعديل الرصيد!' : 'تم رفض الطلب واستبعاده!');
                 loadOrders();
                 loadUsersData();
             }
-        } catch (err) { alert('İşlem başarısız oldu!'); }
+        } catch (err) { alert('فشلت العملية، يرجى التحقق من اتصال السيرفر!'); }
     }
 
-    // 4. توزيع أرباح الـ 15% اليومية على الجميع بضغطة زر
+    // 4. توزيع أرباح الـ 15% اليومية على الجميع بضغطة زر واحدة
     async function distributeProfits() {
-        if (!confirm('Tüm aktif üyelere %15 kâr dağıtmak istediğinize emin misiniz?')) return;
+        if (!confirm('هل أنت متأكد من رغبتك في توزيع أرباح بنسبة 15% على جميع الحسابات النشطة الآن؟')) return;
         try {
             const res = await fetch(`${API_BASE_URL}/api/admin/distribute-profits`, { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                alert('Kâr payları başarıyla dağıtıldı!');
+                alert('تم حساب وتوزيع الأرباح اليومية على الجميع بنجاح!');
                 loadUsersData();
             }
-        } catch (err) { alert('Dağıtım işlemi başarısız oldu!'); }
+        } catch (err) { alert('فشلت عملية توزيع الأرباح!'); }
     }
 
-    // تشغيل التحديث التلقائي للبيانات كل 5 ثوانٍ داخل لوحة المشرف
+    // تحديث الجداول تلقائياً كل 5 ثوانٍ لمراقبة البيانات بشكل حي
     setInterval(() => {
         loadOrders();
         loadUsersData();

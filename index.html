@@ -36,7 +36,7 @@
             margin-bottom: 10px;
             font-size: 14px;
         }
-        button {
+        button, .btn-link {
             width: 100%;
             padding: 12px;
             border: none;
@@ -46,10 +46,15 @@
             cursor: pointer;
             margin-top: 5px;
             color: white;
+            box-sizing: border-box;
+            display: block;
+            text-align: center;
+            text-decoration: none;
         }
         .btn-blue { background-color: #0072ff; }
         .btn-green { background-color: #38ef7d; color: #0b1426; }
         .btn-orange { background-color: #ff5858; }
+        .btn-telegram { background: linear-gradient(135deg, #0088cc, #00a2ed); margin-top: 15px; }
         .stats { margin-top: 10px; }
         .stat-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1c2d4a; }
         .stat-line:last-child { border-bottom: none; }
@@ -61,18 +66,21 @@
 <div class="container">
     <h2>Trading Platform</h2>
 
+    <!-- 1. قفل اسم المستخدم -->
     <div class="box">
         <label>👤 Mevcut Kullanıcı Adı:</label>
         <input type="text" id="username" placeholder="Lütfen kullanıcı adınızı kilitleyin">
         <button class="btn-blue" onclick="registerUser()">💾 Kaydet ve Kilitle</button>
     </div>
 
+    <!-- 2. المكافأة وأعضاء الفريق -->
     <div class="box">
         <label>🏆 Büyük Ödül (40 üye): 2500 ABD doları</label>
         <label>Aktif ekip üyeleriniz: <span id="teamCount" style="color:#38ef7d; font-weight:bold;">0 / 40</span></label>
         <button class="btn-orange" onclick="sendBonusRequest()">📢 Bonusu Yöneticiye Gönder</button>
     </div>
 
+    <!-- 3. لوحة الأرصدة -->
     <div class="box">
         <div class="stats">
             <div class="stat-line">
@@ -90,6 +98,7 @@
         </div>
     </div>
 
+    <!-- 4. أزرار Para Çekme (السحب) -->
     <div class="box">
         <label>🚨 Anında Para Çekme İşlemleri Paneli (TRC-20 Ağı):</label>
         <input type="text" id="withdrawAddress" placeholder="Cüzdan Adresinizi Girin...">
@@ -98,6 +107,7 @@
         <button class="btn-blue" onclick="withdraw('Davetiye Ödülünü Çek')">🎁 Davetiye Ödülünü Çek</button>
     </div>
 
+    <!-- 5. طلب Para Yatırma (الإيداع) وزر الدعم الفني -->
     <div class="box">
         <label>📥 Para Yatırma İsteği (USDT TRC-20):</label>
         <input type="text" id="walletAddress" value="TA1vsgrJEFy3YM6rkQWBppnZemFE6c9pBN" readonly style="text-align:center; color:#38ef7d; font-weight:bold;">
@@ -107,6 +117,9 @@
         <input type="number" id="depositAmount" placeholder="Miktar girin...">
         <span class="alert">⚠ Minimum para yatırma miktarı 100 USD'dir</span>
         <button class="btn-green" style="margin-top:8px;" onclick="sendDeposit()">⚡ Para Yatırma İsteği Gönder</button>
+
+        <!-- زر التلغرام المربوط بحسابك مباشرة -->
+        <a href="https://t.me" target="_blank" class="btn-link btn-telegram">🚀 Telegram Destek Ekibiyle İletişime Geçin</a>
     </div>
 </div>
 
@@ -128,7 +141,7 @@
                 localStorage.setItem('savedUsername', username);
                 loadUserData(username);
             }
-        } catch(err) { alert('Sunucu bağlantı hatası!'); }
+        } catch(err) { alert('Sunuru bağlantı hatası!'); }
     }
 
     async function loadUserData(username) {

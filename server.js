@@ -1,105 +1,173 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
+
 const app = express();
 
-// 🔓 1. تفعيل حزمة الـ CORS لفتح الحظر السحابي تماماً بين الواجهات
+// 1. تفعيل CORS وحظر الحساب السحابي تماماً بين الواجهات
 app.use(cors({ origin: '*', methods: ['GET', 'POST'] }));
 app.use(express.json());
 
-// 📦 2. قواعد البيانات السحابية المؤقتة لحفظ الطلبات والأرصدة بدون مسح
-let orders = [];
-let usersData = {};
+// 2. الاتصال بقاعدة بيانات MongoDB باستخدام الرابط من ملف .env
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('🚀 تم الاتصال بنجاح بقاعدة بيانات MongoDB!'))
+  .catch(err => console.error('❌ فشل الاتصال بقاعدة البيانات:', err));
 
-// صفحة ترحيبية للتأكد من عمل السيرفر عند فتحه مباشرة
+// 3. تصميم جداول قاعدة البيانات (Schemas & Models)
+const UserSchema = new mongoose.Schema({
+    username: { type: String, unique: true, required: true },
+    capital: { type: Number, default: 0 },
+    todayProfit: { type: Number, default: 0 },
+    inviteProfit: { type: Number, default: 0 },
+    teamCount: { type: Number, default: 0 }
+});
+const User = mongoose.model('User', UserSchema);
+
+const OrderSchema = new mongoose.Schema({
+    id: { type: String, required: true },
+    username: { type: String, required: true },
+    type: { type: String, required: true },
+    status: { type: String, default: 'قيد الانتظار' },
+    amount: { type: Number, default: 0 },
+    address: { type: String, default: '' }
+});
+const Order = mongoose.model('Order', OrderSchema);
+
+// 4. صفحة ترحيبية للتأكد من عمل السيرفر
 app.get('/', (req, res) => {
     res.send('🚀 Sunucu Aktif ve Sorunsuz Çalışıyor!');
 });
 
-// 👤 3. استقبال تسجيل العضوية وقفل الحساب الفوري لزيادة عداد الأعضاء
-app.post('/api/register-user', (req, res) => {
+// 5. تسجيل العضوية وقفل الحساب الفوري
+app.post('/api/register-user', async (req, res) => {
     const { username } = req.body;
-    if (username && !usersData[username]) {
-        usersData[username] = { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 };
-        console.log(`👤 عضو جديد قفل حسابه: ${username}`);
-    }
-    res.json({ success: true });
-});
+    if (!username) return res.status(400).json({ success: false, message: 'اسم المستخدم مطلوب' });
 
-// 📥 4. استقبال طلبات الإيداع والسحب الثلاثة ومكافأة الدعوة من شاشة المستخدم
-app.post('/api/orders', (req, res) => {
-    const order = req.body;
-    order.id = Date.now().toString(); // توليد رقم مميز للطلب
-    order.status = 'قيد الانتظار';
-    orders.push(order);
-    console.log(`📥 طلب جديد وارد من: ${order.username} | النوع: ${order.type}`);
-    res.status(200).json({ success: true });
-});
-
-// 🖥️ 5. تزويد شاشة المشرف بالطلبات المنتظرة لعرضها في الجدول الأول
-app.get('/api/admin/orders', (req, res) => {
-    res.json(orders);
-});
-
-// 📊 6. تزويد شاشة المشرف بأرصدة وأرباح الأعضاء وعدد المشتركين الكلي للجدول الثاني
-app.get('/api/admin/users-profits', (req, res) => {
-    res.json(usersData);
-});
-
-// 💰 7. زر المشرف اليدوي لتوزيع أرباح الـ 15% على الحسابات المشحونة فقط
-app.post('/api/admin/distribute-profits', (req, res) => {
-    let count = 0;
-    for (let username in usersData) {
-        const user = usersData[username];
-        if (user.capital > 0) {
-            user.todayProfit += user.capital * 0.15; // زيادة 15% من رأس المال المشحون
-            count++;
+    try {
+        let user = await User.findOne({ username });
+        if (!user) {
+            user = new User({ username });
+            await user.save();
+            console.log(`👤 عضو جديد قفل حسابه: ${username}`);
         }
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
-    console.log(`🎯 قام المشرف بتوزيع أرباح الـ 15% يدوياً على ${count} حساب.`);
-    res.json({ success: true, message: `Başarıyla ${count} hesaba %15 kâr dağıtıldı!` });
 });
 
-// 🎯 8. معالجة قرار المشرف (قبول أو رفض) لتحديث الخانات الثلاث للسحب والإيداع
-app.post('/api/admin/action', (req, res) => {
+// 6. الإيداع والسحب الثلاثة ومكافأة الدعوة من شاشة المستخدم
+app.post('/api/orders', async (req, res) => {
+    const { username, type, amount, address } = req.body;
+    try {
+        const newOrder = new Order({
+            id: Date.now().toString(),
+            username,
+            type,
+            amount: amount || 0,
+            address: address || '',
+            status: 'قيد الانتظار'
+        });
+        await newOrder.save();
+        console.log(`📩 طلب جديد من: ${username} | النوع: ${type}`);
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 7. شاشة المشرف بالطلبات المنتظرة لعرضها في الجدول الأول
+app.get('/api/admin/orders', async (req, res) => {
+    try {
+        const orders = await Order.find({ status: 'قيد الانتظار' });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 8. أرصدة وأرباح الأعضاء وعدد المشتركين الكلي للجدول الثاني
+app.get('/api/admin/users-profits', async (req, res) => {
+    try {
+        const users = await User.find({});
+        const usersData = {};
+        users.forEach(user => {
+            usersData[user.username] = {
+                capital: user.capital,
+                todayProfit: user.todayProfit,
+                inviteProfit: user.inviteProfit,
+                teamCount: user.teamCount
+            };
+        });
+        res.json(usersData);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 9. اليدوي لتوزيع أرباح الـ 15% على الحسابات المشحونة فقط
+app.post('/api/admin/distribute-profits', async (req, res) => {
+    try {
+        const result = await User.updateMany(
+            { capital: { \(gt: 0 } },             [ {\)set: { todayProfit: { \(add: ["\)todayProfit", { \(multiply: ["\)capital", 0.15] }] } } } ]
+        );
+        console.log(`💰 تم توزيع أرباح الـ 15% يدوياً على الحسابات النشطة.`);
+        res.json({ success: true, message: 'Başarıyla Dağıtıldı' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 10. (قبول أو رفض) لتحديث الخانات الثلاث للسحب والإيداع
+app.post('/api/admin/action', async (req, res) => {
     const { orderId, action } = req.body;
-    const orderIndex = orders.findIndex(o => o.id === orderId);
+    try {
+        const order = await Order.findOne({ id: orderId });
+        if (!order) return res.status(404).json({ success: false, message: 'الطلب غير موجود' });
 
-    if (orderIndex === -1) return res.status(404).json({ success: false });
+        if (action === 'accept') {
+            let user = await User.findOne({ username: order.username });
+            if (!user) user = new User({ username: order.username });
 
-    const order = orders[orderIndex];
-
-    if (action === 'accept') {
-        // تأمين وجود الحساب في الذاكرة السحابية
-        if (!usersData[order.username]) {
-            usersData[order.username] = { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 };
+            if (order.type === 'Yatırma') {
+                user.capital += order.amount;
+            } else if (order.type === 'Toplam Sermayeyi Çek') {
+                user.capital = 0;
+            } else if (order.type === 'Bugünkü Kârı Çek') {
+                user.todayProfit = 0;
+            } else if (order.type === 'Davetiye Ödülünü Çek') {
+                user.inviteProfit = 0;
+            } else if (order.type === 'Referans Bonusunu Çek') {
+                user.teamCount = 0; // أو الحسبة المعتمدة لديك
+            }
+            await user.save();
         }
 
-        // التعرف على العمليات القادمة من الأزرار الثلاثة لشاشة المستخدم وتنفيذها بدقة
-        if (order.type === 'Yatırma') { // طلب إيداع
-            usersData[order.username].capital += parseFloat(order.amount || 0);
-        } else if (order.type === 'Toplam Sermaye Çekme') { // سحب رأس المال بالكامل
-            usersData[order.username].capital = Math.max(0, usersData[order.username].capital - parseFloat(order.amount || 0));
-        } else if (order.type === 'Bugünkü Kâr Çekme') { // سحب أرباح اليوم
-            usersData[order.username].todayProfit = Math.max(0, usersData[order.username].todayProfit - parseFloat(order.amount || 0));
-        } else if (order.type === 'Davetiye Ödülü Çekme') { // سحب أرباح الدعوات
-            usersData[order.username].inviteProfit = Math.max(0, usersData[order.username].inviteProfit - parseFloat(order.amount || 0));
-        } else if (order.type === 'Referans Bonusu') { // طلب مكافأة دعوة صديق
-            usersData[order.username].teamCount += 1;
-            usersData[order.username].inviteProfit += 15; // إضافة 15 دولار لخانة المكافآت المستقلة
-        }
+        // تحديث حالة الطلب بدلاً من مسحه نهائياً ليتم استبعاده من قائمة الانتظار
+        order.status = action === 'accept' ? 'مقبول' : 'مرفوض';
+        await order.save();
+
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
-
-    // إزالة الطلب من الجدول بعد اتخاذ القرار (قبول/رفض)
-    orders.splice(orderIndex, 1);
-    res.json({ success: true });
 });
 
-// 🔄 9. الفحص الدوري المستمر لتحديث خانات وأرصدة شاشة المستخدم تلقائياً
-app.get('/api/users/:username', (req, res) => {
-    const username = req.params.username;
-    res.json(usersData[username] || { capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 });
+// 11. تحديث مستمر لتحديث خانات وأرصدة شاشة المستخدم تلقائياً
+app.get('/api/users/:username', async (req, res) => {
+    const { username } = req.params;
+    try {
+        const user = await User.findOne({ username });
+        if (user) {
+            res.json(user);
+        } else {
+            res.json({ capital: 0, todayProfit: 0, inviteProfit: 0, teamCount: 0 });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
-// ⚙️ إعداد منفذ التشغيل السحابي لـ Render و Vercel
+// 12. إعداد منفذ التشغيل السحابي لـ Vercel و Render
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 السيرفر المحدث يعمل بكفاءة كاملة على المنفذ ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 السيرفر يعمل على المنفذ: ${PORT}`));
